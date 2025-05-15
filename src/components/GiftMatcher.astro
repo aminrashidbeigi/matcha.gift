@@ -67,7 +67,7 @@ function findBestMatch(selectedInterests: string[]) {
           interests.map((interest) => (
             <label class="relative inline-flex cursor-pointer items-center">
               <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
-              <div class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)]">
+              <div class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
                 {interest.label}
               </div>
             </label>
@@ -254,10 +254,3 @@ function findBestMatch(selectedInterests: string[]) {
     matchButton.addEventListener('click', updateGiftMatch)
   }
 </script>
-
-<style>
-  input[type='checkbox']:checked + div {
-    background-color: var(--link-color);
-    color: var(--color-neutral-100);
-  }
-</style>
