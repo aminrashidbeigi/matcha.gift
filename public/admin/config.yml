@@ -1,0 +1,32 @@
+local_backend: true
+
+backend:
+  name: test-repo
+
+media_folder: "public/posts"
+public_folder: "/public"
+
+collections:
+  - name: "posts"
+    label: "Posts"
+    folder: "src/content/posts"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime" }
+      - { label: "Author", name: "author", widget: "string" }
+      - { label: "Author Image", name: "authImage", widget: "string" }
+      - { label: "Cover Image", name: "image", widget: "image" }
+      - { label: "Tags", name: "tags", widget: "list", default: [] }
+      - { label: "Summary", name: "summary", widget: "text" }
+      - {
+          label: "Type",
+          name: "type",
+          widget: "select",
+          options: ["Article", "Product"],
+        }
+      - { label: "Body", name: "body", widget: "markdown" }

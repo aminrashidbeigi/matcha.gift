@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets'
+import logo from '../assets/img/logo.svg'
+
+/**
+ * Logo Component
+ *
+ * @description Logo component that displays the site logo with optional text
+ */
+interface Props {
+  /**
+   * Whether to load the image eagerly or lazily
+   * @default 'eager'
+   */
+  loading?: 'eager' | 'lazy'
+  /**
+   * Whether to show the text next to the logo
+   * @default true
+   */
+  showText?: boolean
+  /**
+   * Custom logo image (optional)
+   * @default '../assets/img/logo.svg'
+   */
+  customLogo?: ImageMetadata
+}
+
+const { loading = 'eager', showText = true, customLogo }: Props = Astro.props
+
+// Use custom logo if provided, otherwise use default
+const logoImage = customLogo || logo
+---
+
+<a href="/" class="flex items-center gap-2 !no-underline">
+  <Image src={logoImage} alt="MatchaGift Logo" width="47" height="37" loading={loading} />
+  {showText && <span class="font-bold">MatchaGift</span>}
+</a>
+
+<style lang="scss">
+  a {
+    color: var(--foreground-color);
+  }
+</style>
