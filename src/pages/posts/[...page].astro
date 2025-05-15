@@ -41,24 +41,24 @@ const totalPages = Math.ceil(page.total / page.size)
 ---
 
 <DefaultLayout
-  title="Portfolio"
+  title="Posts"
   description="A showcase of projects built with Astro Content Collections, demonstrating dynamic content management."
 >
   <PageHeader
-    title="Portfolio"
+    title="Posts"
     subtitle='A showcase of projects built with Astro Content Collections, demonstrating dynamic content management and organization. Learn more about <a href="https://docs.astro.build/en/guides/content-collections/">Astro Content Collections</a> in the official documentation.'
     bgType="bordered"
   />
   <section class="my-12">
     <div class="container">
-      <p class="text-sm"><em>Project {page.start + 1} through {page.end + 1} of {page.total} total projects</em></p>
+      <p class="text-sm"><em>Post {page.start + 1} through {page.end + 1} of {page.total} total posts</em></p>
       <ul class="my-3 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {
           page.data.map((project) => (
             <li>
               <Card
                 imageComponent={project.featuredImage}
-                url={'/portfolio/' + project.id}
+                url={'/posts/' + project.id}
                 title={project.data.title}
                 footer={'Author: ' + project.data.author}
               >
@@ -70,13 +70,13 @@ const totalPages = Math.ceil(page.total / page.size)
       </ul>
       <div class="mt-12 grid place-content-center">
         <Pagination
-          firstPage={page.url.prev ? '/portfolio' : null}
+          firstPage={page.url.prev ? '/posts' : null}
           previousPage={page.url.prev ? page.url.prev : null}
           nextPage={page.url.next ? page.url.next : null}
-          lastPage={page.url.next ? `/portfolio/${Math.ceil(page.total / page.size)}` : null}
+          lastPage={page.url.next ? `/posts/${Math.ceil(page.total / page.size)}` : null}
           currentPage={`${page.currentPage}`}
           totalPages={`${Math.ceil(page.total / page.size)}`}
-          ariaLabel="Portfolio pagination"
+          ariaLabel="Posts pagination"
         />
       </div>
     </div>

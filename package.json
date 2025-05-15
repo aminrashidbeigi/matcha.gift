@@ -23,7 +23,7 @@
     "ui-library",
     "ui-components",
     "blog",
-    "portfolio"
+    "posts"
   ],
   "repository": {
     "type": "git",

@@ -1,0 +1,55 @@
+---
+import DefaultLayout from '../layouts/DefaultLayout.astro'
+import PageHeader from '../components/PageHeader.astro'
+import ExternalLink from '../components/ExternalLink.astro'
+
+const currentYear = new Date().getFullYear()
+---
+
+<DefaultLayout title="About">
+  <PageHeader title="About" />
+  <main class="container">
+    <div class="mx-auto max-w-3xl">
+      <div class="prose prose-lg dark:prose-invert">
+        <h2>Our Mission</h2>
+        <p>
+          We're dedicated to helping you find the perfect gift for your loved ones. Our intelligent gift matching system
+          takes into account interests, preferences, and budget to suggest personalized gift ideas.
+        </p>
+
+        <h2>How It Works</h2>
+        <p>
+          Simply select your interests and price range, and our system will match you with the ideal gift. You can also
+          use our "Surprise Me!" feature to discover unexpected gift ideas.
+        </p>
+
+        <h2>Features</h2>
+        <ul>
+          <li>Personalized gift recommendations</li>
+          <li>Price range filtering</li>
+          <li>Multiple currency support (EUR/USD)</li>
+          <li>Dark/Light mode</li>
+          <li>Accessible design</li>
+        </ul>
+
+        <h2>Contact</h2>
+        <p>
+          Have questions or suggestions? We'd love to hear from you! Reach out to us at{' '}
+          <a href="mailto:contact@matcha.gift">contact@matcha.gift</a>
+        </p>
+
+        <div class="mt-16 border-t border-[var(--border-color-subtle)] pt-8">
+          <h2>Credits</h2>
+          <p>
+            Built with <ExternalLink href="https://astro.build/">Astro</ExternalLink> and inspired by{' '}
+            <ExternalLink href="https://github.com/markteekman/accessible-astro-starter"
+              >accessible Astro starter</ExternalLink
+            > by{' '}
+            <ExternalLink href="https://github.com/markteekman">Mark Teekman</ExternalLink> of{' '}
+            <ExternalLink href="https://www.incluud.dev">Incluud</ExternalLink>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</DefaultLayout>

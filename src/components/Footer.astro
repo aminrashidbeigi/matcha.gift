@@ -1,4 +1,5 @@
 ---
+import { Icon } from 'astro-icon/components'
 import CallToAction from './CallToAction.astro'
 import ExternalLink from './ExternalLink.astro'
 import Logo from './Logo.astro'
@@ -11,78 +12,55 @@ import Logo from './Logo.astro'
 const currentYear = new Date().getFullYear()
 ---
 
-<footer>
-  <!-- <CallToAction />
-  <section class="py-20">
-    <h2 class="sr-only">Footer</h2>
-    <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-      <div class="flex flex-col gap-4">
-        <h3 class="text-2xl font-bold">Navigation</h3>
-        <ul class="flex flex-col gap-2">
-          <li><a href="/">Home</a></li>
-          <li><a href="/blog">Blog</a></li>
-          <li><a href="/portfolio">Portfolio</a></li>
-        </ul>
-      </div>
-      <div class="flex flex-col gap-4">
-        <h3 class="text-2xl font-bold">Theme features</h3>
-        <ul class="flex flex-col gap-2">
-          <li><a href="/accessibility-statement">Accessibility statement</a></li>
-          <li><a href="/accessible-components">Accessible components</a></li>
-          <li><a href="/color-contrast-checker">Color contrast checker</a></li>
-          <li><a href="/markdown-page">Markdown page</a></li>
-          <li><a href="/mdx-page">MDX page</a></li>
-          <li><a href="/404-page">404 page</a></li>
-        </ul>
-      </div>
-      <div class="flex flex-col gap-4">
-        <h3 class="text-2xl font-bold">Developer tools</h3>
-        <ul class="flex flex-col gap-2">
-          <li>
-            <ExternalLink href="https://www.w3.org/WAI/ARIA/apg/">ARIA Authoring Practices</ExternalLink>
-          </li>
-          <li>
-            <ExternalLink href="https://web.dev/articles/focus">Focus Management</ExternalLink>
-          </li>
-          <li>
-            <ExternalLink href="https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML"
-              >Semantic HTML Guide</ExternalLink
-            >
-          </li>
-          <li>
-            <ExternalLink href="https://www.tpgi.com/screen-reader-user-survey-results/"
-              >Screen Reader Survey</ExternalLink
-            >
-          </li>
-        </ul>
-      </div>
-      <div class="flex flex-col gap-4">
-        <Logo loading="lazy" />
-        <p class="leading-[1.75]">
-          Tip: always test for screen reader support. Press <kbd>⌘</kbd> + <kbd>F5</kbd> to start VoiceOver or <kbd
-            >Win</kbd
-          >
-          + <kbd>Ctrl</kbd> + <kbd>Enter</kbd> for Narrator.
-        </p>
-      </div>
-    </div>
-  </section> -->
-  <section class="py-8">
-    <div class="container flex flex-col gap-4 md:flex-row md:justify-between">
-      <p>
-        &copy; {currentYear} - Starter Theme for <a href="https://astro.build/">Astro</a>.
-      </p>
-      <p>
-        Made with ❤️ by <a href="https://github.com/markteekman">Mark Teekman</a>. Part of <a
-          href="https://www.incluud.dev">Incluud</a
-        >.
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <p class="made-with-love">
+        Made with <Icon name="lucide:heart" class="heart-icon" />
+        {currentYear}
       </p>
     </div>
-  </section>
+  </div>
 </footer>
 
-<style>
-  section {
-    border-top: 1px solid var(--border-color-subtle);
+<style lang="scss">
+  .footer {
+    opacity: 0.8;
+    padding: 2rem 0;
+    color: var(--foreground-color);
+    text-align: center;
+
+    .made-with-love {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+
+      .heart-icon {
+        animation: heartbeat 1.5s ease-in-out infinite;
+        width: 1.2rem;
+        height: 1.2rem;
+        color: #e25555;
+      }
+    }
+  }
+
+  @keyframes heartbeat {
+    0% {
+      transform: scale(1);
+    }
+    14% {
+      transform: scale(1.3);
+    }
+    28% {
+      transform: scale(1);
+    }
+    42% {
+      transform: scale(1.3);
+    }
+    70% {
+      transform: scale(1);
+    }
   }
 </style>

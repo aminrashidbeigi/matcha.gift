@@ -14,13 +14,22 @@ import { Icon } from 'astro-icon/components'
   <SkipLink />
   <Navigation>
     <li class="menu-item">
-      <a href="/">Gift Matcher!</a>
+      <a href="/" class={Astro.url.pathname === '/' ? 'is-active' : ''}>Gift Matcher!</a>
     </li>
     <!-- <li class="menu-item">
       <a href="/blog/">Blog</a>
     </li> -->
     <li class="menu-item">
-      <a href="/portfolio/">Portfolio</a>
+      <a href="/posts/" class={Astro.url.pathname === '/posts/' ? 'is-active' : ''}>Posts</a>
+    </li>
+    <li class="menu-item">
+      <a href="/about/" class={Astro.url.pathname === '/about/' ? 'is-active' : ''}>About</a>
+    </li>
+    <li class="menu-item type-icon animate-rotate">
+      <button id="currency-toggle" class="currency-toggle" aria-label="Toggle currency">
+        <Icon name="lucide:dollar-sign" slot="usd" />
+        <Icon name="lucide:euro" slot="eur" />
+      </button>
     </li>
     <!-- <li class="menu-item has-dropdown">
       <button aria-haspopup="true" aria-expanded="false">
@@ -77,5 +86,62 @@ import { Icon } from 'astro-icon/components'
         block-size: 30px;
       }
     }
+
+    .currency-toggle {
+      transition: color 0.2s ease-in-out;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      color: var(--link-color);
+
+      &:hover {
+        color: var(--link-hover-color);
+      }
+
+      svg {
+        display: none;
+        inline-size: 30px;
+        block-size: 30px;
+      }
+
+      &[data-currency='USD'] svg[slot='usd'],
+      &[data-currency='EUR'] svg[slot='eur'] {
+        display: block;
+      }
+    }
   }
 </style>
+
+<script>
+  // Initialize currency state
+  function initCurrency() {
+    const currentCurrency = localStorage.getItem('currency') || 'EUR'
+    document.documentElement.setAttribute('data-currency', currentCurrency)
+    const toggle = document.getElementById('currency-toggle')
+    if (toggle) {
+      toggle.setAttribute('data-currency', currentCurrency)
+    }
+  }
+
+  // Initialize on page load
+  initCurrency()
+
+  // Handle currency toggle
+  document.getElementById('currency-toggle')?.addEventListener('click', () => {
+    const currentCurrency = document.documentElement.getAttribute('data-currency')
+    const newCurrency = currentCurrency === 'USD' ? 'EUR' : 'USD'
+
+    localStorage.setItem('currency', newCurrency)
+    document.documentElement.setAttribute('data-currency', newCurrency)
+    const toggle = document.getElementById('currency-toggle')
+    if (toggle) {
+      toggle.setAttribute('data-currency', newCurrency)
+    }
+
+    window.dispatchEvent(new CustomEvent('currencyChange', { detail: newCurrency }))
+  })
+
+  // Re-initialize on navigation
+  document.addEventListener('astro:page-load', initCurrency)
+</script>

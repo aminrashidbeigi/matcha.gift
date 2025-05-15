@@ -4,7 +4,7 @@
 
 ![accessible-astro-starter](https://github.com/user-attachments/assets/01630a5b-10bb-4765-a291-74725fedc04f)
 
-A ready-to-use, SEO and accessibility-focused Astro starter template. Built with modern web standards and WCAG guidelines in mind, it provides a solid foundation for creating inclusive websites. Features Tailwind CSS 4 integration, comprehensive component library, color contrast checker, and typography with Atkinson Hyperlegible font for improved readability. Includes dynamic blog/portfolio pages with social sharing, and full MDX support.
+A modern, accessible, and feature-rich Astro starter template. Built with accessibility in mind, this template provides a solid foundation for creating inclusive web experiences. Includes dynamic blog/posts pages with social sharing, and full MDX support.
 
 [![LIVE DEMO](https://img.shields.io/badge/LIVE_DEMO-4ECCA3?style=for-the-badge&logo=astro&logoColor=black)](https://accessible-astro-starter.incluud.dev/) &nbsp;
 [![DOCUMENTATION](https://img.shields.io/badge/DOCUMENTATION-A682FF?style=for-the-badge&logo=astro&logoColor=black)](https://accessible-astro.incluud.dev/) &nbsp;
@@ -14,41 +14,45 @@ A ready-to-use, SEO and accessibility-focused Astro starter template. Built with
 
 > Provide developers with accessible, easy-to-use components that make building inclusive web applications simpler and faster, without compromising on customization or performance.
 
-## (Accessibility) Features
+## 🚀 Features
 
-- Astro 5.7.5+
-- Tailwind CSS 4 support
-- TypeScript integration with path aliases for easier imports
-- Prettier integration with `prettier-plugin-astro` and `prettier-plugin-tailwind`
-- ESLint integration with strict accessibility settings for `eslint-plugin-jsx-a11y`
-- Markdown and MDX support with comprehensive examples and components
-- Modern OKLCH color system with automatic palette generation from primary/secondary colors
-- Atkinson Hyperlegible font for improved readability and accessibility
-- Lucide icon set via `astro-icon` for consistent, friendly icons
-- Excellent Lighthouse/PageSpeed scores
-- Accessible landmarks such as `header`, `main`, `footer`, `section` and `nav`
-- Outline focus indicator which works on dark and light backgrounds
-- Several `aria` attributes which provide a better experience for screen reader users
-- `[...page].astro` and `[post].astro` demonstrate the use of dynamic routes and provide a basic blog with breadcrumbs and pagination
-- `404.astro` provides a custom 404 error page which you can adjust to your needs
-- `Header.astro` component with optimized accessibility and design
-- `Footer.astro` component with informative content and links
-- `SkipLinks.astro` component to skip to either the main menu or the main content
-- `Navigation.astro` component with keyboard accessible (dropdown) navigation and highlighted menu item option
-- `ResponsiveToggle.astro` component with accessible responsive toggle functionality
-- `DarkMode.astro` component toggle with accessible button and a user system preferred color scheme setting
-- `SiteMeta.astro` SEO component for setting custom meta data on different pages
-- `.sr-only` utility class for screen reader only text content (hides text visually)
-- `prefers-reduced-motion` disables animations for users that have this preference turned on
-- Components including `ColorContrast.astro`, `BlockQuote.astro`, `BreakoutImage.astro`, `ExternalLink.astro`, `Logo.astro`, `SocialShares.astro`, and `PageHeader.astro`
-- Blog and portfolio pages with featured images, author details, social sharing, and breakout images
-- Accessibility Statement template page
-- Color Contrast Checker interactive page
-- Smooth micro-interactions and animations on hover, open and close states (respecting reduced motion preferences)
-- Comprehensive SCSS utility classes
-- CSS with logical properties and custom properties
-- Accessible button and hyperlink styling with clear focus states
-- Styled `<kbd>` element for keyboard shortcut documentation
+- **Accessibility First**: Built with accessibility as a core principle, ensuring your site is usable by everyone
+- **Modern Design**: Clean, responsive design that works on all devices
+- **Performance Optimized**: Fast loading times and optimal performance out of the box
+- **SEO Ready**: Built-in SEO features to help your site rank better
+- **Dark Mode**: Automatic dark mode support with system preference detection
+- **Content Collections**: Organized content management with Astro Content Collections
+- **MDX Support**: Write content in MDX with full component support
+- **Social Sharing**: Easy social media sharing for your content
+- **Responsive Images**: Automatic image optimization and responsive images
+- **TypeScript**: Full TypeScript support for better development experience
+- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **Accessible Components**: Pre-built accessible components ready to use
+- **Blog and Posts Pages**: Dynamic blog and posts pages with featured images, author details, social sharing, and breakout images
+- **Color Contrast Checker**: Built-in color contrast checker to ensure your site meets WCAG guidelines
+- **404 Page**: Custom 404 page with helpful navigation
+- **Markdown Support**: Write content in Markdown with full support for frontmatter
+- **Responsive Navigation**: Mobile-friendly navigation with dropdown support
+- **Skip Links**: Keyboard navigation support with skip links
+- **Focus Management**: Proper focus management for better keyboard navigation
+- **ARIA Labels**: Proper ARIA labels for better screen reader support
+- **Semantic HTML**: Proper semantic HTML structure for better accessibility
+- **Color Scheme**: Accessible color scheme with proper contrast ratios
+- **Typography**: Accessible typography with proper line heights and spacing
+- **Forms**: Accessible forms with proper labels and error handling
+- **Buttons**: Accessible buttons with proper focus states
+- **Links**: Accessible links with proper focus states
+- **Images**: Accessible images with proper alt text
+- **Tables**: Accessible tables with proper headers
+- **Lists**: Accessible lists with proper structure
+- **Headings**: Accessible headings with proper hierarchy
+- **Landmarks**: Proper landmark structure for better navigation
+- **Live Regions**: Proper live regions for dynamic content
+- **Error Handling**: Proper error handling for better user experience
+- **Loading States**: Proper loading states for better user experience
+- **Animations**: Accessible animations with proper reduced motion support
+- **Keyboard Navigation**: Proper keyboard navigation support
+- **Screen Reader Support**: Proper screen reader support
 
 ## Getting started
 
