@@ -2,6 +2,7 @@
 import type { ComponentProps } from 'astro/types'
 import { Modal } from 'accessible-astro-components'
 import productsData from '../data/products.json'
+import interests from '../data/giftmatcher-interests.json'
 
 /**
  * GiftMatcher Component
@@ -23,19 +24,6 @@ interface Product {
   seller: string
   tags: string[]
 }
-
-const interests: Interest[] = [
-  { id: 'sport', label: 'Sport' },
-  { id: 'art', label: 'Art' },
-  { id: 'travel', label: 'Travel' },
-  { id: 'music', label: 'Music' },
-  { id: 'reading', label: 'Reading' },
-  { id: 'cooking', label: 'Cooking' },
-  { id: 'gaming', label: 'Gaming' },
-  { id: 'photography', label: 'Photography' },
-  { id: 'fashion', label: 'Fashion' },
-  { id: 'technology', label: 'Technology' },
-]
 
 // Map interests to product tags
 const interestToTags: Record<string, string[]> = {
@@ -66,20 +54,20 @@ function findBestMatch(selectedInterests: string[]) {
 }
 ---
 
-<section
-  class="bg-gradient-to-b from-[var(--color-neutral-100)] to-white py-16 dark:from-[var(--color-neutral-900)] dark:to-[var(--color-neutral-800)]"
->
+<section class="bg-[var(--background-color)] py-16">
   <div class="container">
     <div class="mx-auto max-w-3xl text-center">
-      <h2 class="mb-8 text-4xl font-bold">Find the Perfect Gift</h2>
-      <p class="mb-12 text-xl">Select interests to help us match you with the ideal gift</p>
+      <h2 class="mb-8 text-4xl font-bold text-[var(--foreground-color)]">Find the Perfect Gift</h2>
+      <p class="mb-12 text-xl text-[var(--foreground-color)]">
+        Select interests to help us match you with the ideal gift
+      </p>
 
       <div class="mb-12 flex flex-wrap justify-center gap-4">
         {
           interests.map((interest) => (
             <label class="relative inline-flex cursor-pointer items-center">
               <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
-              <div class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] dark:hover:bg-[var(--link-hover-color)]">
+              <div class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)]">
                 {interest.label}
               </div>
             </label>
@@ -95,21 +83,23 @@ function findBestMatch(selectedInterests: string[]) {
 <Modal triggerId="gift-match-trigger" title="Your Perfect Gift Match" closeText="Close">
   <div class="p-6">
     <div id="gift-match-result" class="space-y-6">
-      <p class="text-xl">Based on your interests, we've found the perfect gift for you!</p>
-      <div class="rounded-lg bg-[var(--color-neutral-100)] p-6 dark:bg-[var(--color-neutral-800)]">
+      <p class="text-xl text-[var(--foreground-color)]">
+        Based on your interests, we've found the perfect gift for you!
+      </p>
+      <div class="rounded-lg border border-[var(--border-color-subtle)] bg-[var(--background-color)] p-6">
         <div class="flex flex-col gap-6 md:flex-row">
           <img id="gift-image" src="" alt="" class="h-48 w-full rounded-lg object-cover md:w-1/2" />
           <div class="flex-1 space-y-4">
-            <h3 id="gift-title" class="text-2xl font-bold"></h3>
-            <p id="gift-price" class="text-xl font-semibold"></p>
-            <p id="gift-seller" class="text-gray-600 dark:text-gray-300"></p>
+            <h3 id="gift-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
+            <p id="gift-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
+            <p id="gift-seller" class="text-[var(--foreground-color)] opacity-70"></p>
             <div id="gift-tags" class="flex flex-wrap gap-2"></div>
             <a
               id="gift-link"
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              class="block w-full rounded-lg bg-[var(--link-color)] py-2 text-center text-white transition-colors hover:bg-[var(--link-hover-color)]"
+              class="block w-full rounded-lg bg-[var(--link-color)] py-2 text-center text-[var(--color-neutral-100)] transition-colors hover:bg-[var(--link-hover-color)]"
             >
               View Product
             </a>
@@ -250,8 +240,8 @@ function findBestMatch(selectedInterests: string[]) {
       const tagElement = document.createElement('span')
       tagElement.className = `px-2 py-1 rounded-full text-sm ${
         selectedInterests.some((interest) => interestToTags[interest]?.includes(tag))
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100'
+          ? 'bg-[var(--color-primary-100)] text-[var(--color-primary-900)] dark:bg-[var(--color-primary-900)] dark:text-[var(--color-primary-100)]'
+          : 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-900)] dark:bg-[var(--color-neutral-700)] dark:text-[var(--color-neutral-100)]'
       }`
       tagElement.textContent = tag
       tagsContainer.appendChild(tagElement)

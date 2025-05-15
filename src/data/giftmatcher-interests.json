@@ -1,0 +1,42 @@
+[
+    {
+        "id": "sport",
+        "label": "Sport"
+    },
+    {
+        "id": "art",
+        "label": "Art"
+    },
+    {
+        "id": "travel",
+        "label": "Travel"
+    },
+    {
+        "id": "music",
+        "label": "Music"
+    },
+    {
+        "id": "reading",
+        "label": "Reading"
+    },
+    {
+        "id": "cooking",
+        "label": "Cooking"
+    },
+    {
+        "id": "gaming",
+        "label": "Gaming"
+    },
+    {
+        "id": "photography",
+        "label": "Photography"
+    },
+    {
+        "id": "fashion",
+        "label": "Fashion"
+    },
+    {
+        "id": "technology",
+        "label": "Technology"
+    }
+]
