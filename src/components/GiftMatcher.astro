@@ -1,6 +1,7 @@
 ---
 import type { ComponentProps } from 'astro/types'
 import { Modal, Badge } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
 import productsData from '../data/products.json'
 import interests from '../data/giftmatcher-interests.json'
 
@@ -130,9 +131,30 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         </div>
       </div>
 
+      <!-- <div class="flex flex-col gap-3 min-[500px]:flex-row">
+        <a class="button has-icon" href="https://github.com/incluud/accessible-astro-starter" id="gift-match-trigger">
+          <Icon name="lucide:gift" />
+          Match My Gift
+        </a>
+        <a
+          class="button has-icon color-secondary"
+          href="https://accessible-astro.incluud.dev/"
+          id="surprise-me-trigger"
+        >
+          <Icon name="lucide:gift" />
+          Surprise Me!
+        </a>
+      </div> -->
+
       <div class="flex flex-wrap justify-center gap-4">
-        <button id="gift-match-trigger" class="button button-primary px-8 py-4 text-lg">Match My Gift</button>
-        <button id="surprise-me-trigger" class="button button-secondary px-8 py-4 text-lg">Surprise Me!</button>
+        <button id="gift-match-trigger" class="button has-icon px-8 py-4 text-lg">
+          <Icon name="lucide:gift" />
+          Match My Gift
+        </button>
+        <button id="surprise-me-trigger" class="button color-secondary has-icon px-8 py-4 text-lg">
+          <Icon name="lucide:coffee" />
+          Surprise Me!
+        </button>
       </div>
     </div>
   </div>
