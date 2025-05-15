@@ -1,6 +1,6 @@
 ---
 import type { ComponentProps } from 'astro/types'
-import { Modal } from 'accessible-astro-components'
+import { Modal, Badge } from 'accessible-astro-components'
 import productsData from '../data/products.json'
 import interests from '../data/giftmatcher-interests.json'
 
@@ -141,27 +141,19 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
 <Modal triggerId="gift-match-trigger" title="Your Perfect Gift Match" closeText="Close" manual>
   <div class="p-6">
     <div id="gift-match-result" class="space-y-6">
-      <p class="text-xl text-[var(--foreground-color)]">
-        Based on your interests, we've found the perfect gift for you!
-      </p>
-      <div class="rounded-lg border border-[var(--border-color-subtle)] bg-[var(--background-color)] p-6">
-        <div class="flex flex-col gap-6 md:flex-row">
-          <img id="gift-image" src="" alt="" class="h-48 w-full rounded-lg object-cover md:w-1/2" />
-          <div class="flex-1 space-y-4">
-            <h3 id="gift-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
-            <p id="gift-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
-            <p id="gift-seller" class="text-[var(--foreground-color)] opacity-70"></p>
-            <div id="gift-tags" class="flex flex-wrap gap-2"></div>
-            <a
-              id="gift-link"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block w-full rounded-lg bg-[var(--link-color)] py-2 text-center text-[var(--color-neutral-100)] transition-colors hover:bg-[var(--link-hover-color)]"
-            >
-              View Product
-            </a>
-          </div>
+      <div class="gift-modal-card flex flex-col items-center gap-6">
+        <img id="gift-image" src="" alt="" class="h-48 w-full max-w-xs rounded-lg border object-cover" />
+        <div class="flex-1 space-y-2 text-center">
+          <h3 id="gift-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
+          <p id="gift-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
+          <Badge id="gift-seller" type="info" />
+          <a
+            id="gift-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="button button-primary mt-4 block w-full text-center">View Product</a
+          >
         </div>
       </div>
     </div>
@@ -171,25 +163,19 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
 <Modal triggerId="surprise-me-trigger" title="Your Surprise Gift" closeText="Close">
   <div class="p-6">
     <div id="surprise-gift-result" class="space-y-6">
-      <p class="text-xl text-[var(--foreground-color)]">Here's a surprise gift for you!</p>
-      <div class="rounded-lg border border-[var(--border-color-subtle)] bg-[var(--background-color)] p-6">
-        <div class="flex flex-col gap-6 md:flex-row">
-          <img id="surprise-image" src="" alt="" class="h-48 w-full rounded-lg object-cover md:w-1/2" />
-          <div class="flex-1 space-y-4">
-            <h3 id="surprise-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
-            <p id="surprise-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
-            <p id="surprise-seller" class="text-[var(--foreground-color)] opacity-70"></p>
-            <div id="surprise-tags" class="flex flex-wrap gap-2"></div>
-            <a
-              id="surprise-link"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block w-full rounded-lg bg-[var(--link-color)] py-2 text-center text-[var(--color-neutral-100)] transition-colors hover:bg-[var(--link-hover-color)]"
-            >
-              View Product
-            </a>
-          </div>
+      <div class="gift-modal-card flex flex-col items-center gap-6">
+        <img id="surprise-image" src="" alt="" class="h-48 w-full max-w-xs rounded-lg border object-cover" />
+        <div class="flex-1 space-y-2 text-center">
+          <h3 id="surprise-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
+          <p id="surprise-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
+          <Badge id="surprise-seller" type="info" />
+          <a
+            id="surprise-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="button button-primary mt-4 block w-full text-center">View Product</a
+          >
         </div>
       </div>
     </div>
@@ -335,9 +321,8 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     const priceElement = document.getElementById('gift-price')
     const sellerElement = document.getElementById('gift-seller')
     const linkElement = document.getElementById('gift-link') as HTMLAnchorElement
-    const tagsContainer = document.getElementById('gift-tags')
 
-    if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement || !tagsContainer) {
+    if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement) {
       console.error('Could not find all required elements')
       return
     }
@@ -346,21 +331,8 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     imageElement.alt = bestMatch.title
     titleElement.textContent = bestMatch.title
     updatePriceDisplay(priceElement, bestMatch)
-    sellerElement.textContent = `Seller: ${bestMatch.seller}`
+    sellerElement.textContent = bestMatch.seller
     linkElement.href = bestMatch.link
-
-    // Update tags
-    tagsContainer.innerHTML = ''
-    bestMatch.tags.forEach((tag: string) => {
-      const tagElement = document.createElement('span')
-      tagElement.className = `px-2 py-1 rounded-full text-sm ${
-        selectedInterests.some((interest) => interestToTags[interest]?.includes(tag))
-          ? 'bg-[var(--color-primary-100)] text-[var(--color-primary-900)] dark:bg-[var(--color-primary-900)] dark:text-[var(--color-primary-100)]'
-          : 'bg-[var(--color-neutral-100)] text-[var(--color-neutral-900)] dark:bg-[var(--color-neutral-700)] dark:text-[var(--color-neutral-100)]'
-      }`
-      tagElement.textContent = tag
-      tagsContainer.appendChild(tagElement)
-    })
 
     // Open the modal manually
     const modal = document.querySelector('[data-modal="gift-match-trigger"]') as HTMLElement
@@ -379,9 +351,8 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     const priceElement = document.getElementById('surprise-price')
     const sellerElement = document.getElementById('surprise-seller')
     const linkElement = document.getElementById('surprise-link') as HTMLAnchorElement
-    const tagsContainer = document.getElementById('surprise-tags')
 
-    if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement || !tagsContainer) {
+    if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement) {
       console.error('Could not find all required elements')
       return
     }
@@ -390,18 +361,8 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     imageElement.alt = randomProduct.title
     titleElement.textContent = randomProduct.title
     updatePriceDisplay(priceElement, randomProduct)
-    sellerElement.textContent = `Seller: ${randomProduct.seller}`
+    sellerElement.textContent = randomProduct.seller
     linkElement.href = randomProduct.link
-
-    // Update tags
-    tagsContainer.innerHTML = ''
-    randomProduct.tags.forEach((tag: string) => {
-      const tagElement = document.createElement('span')
-      tagElement.className =
-        'px-2 py-1 rounded-full text-sm bg-[var(--color-neutral-100)] text-[var(--color-neutral-900)] dark:bg-[var(--color-neutral-700)] dark:text-[var(--color-neutral-100)]'
-      tagElement.textContent = tag
-      tagsContainer.appendChild(tagElement)
-    })
   }
 
   function updatePriceDisplay(element: HTMLElement, product: Product) {
