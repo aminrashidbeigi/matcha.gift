@@ -26,6 +26,21 @@ interface Product {
   link: string
   seller: string
   tags: string[]
+  description?: string
+}
+
+// Replace emoji icons with lucide icon names for interests
+const interestIcons: Record<string, string> = {
+  sport: 'lucide:dumbbell',
+  art: 'lucide:palette',
+  travel: 'lucide:plane',
+  music: 'lucide:music',
+  reading: 'lucide:book-open',
+  cooking: 'lucide:chef-hat',
+  gaming: 'lucide:gamepad-2',
+  photography: 'lucide:camera',
+  fashion: 'lucide:shirt',
+  technology: 'lucide:laptop',
 }
 
 // Map interests to product tags
@@ -46,10 +61,19 @@ const interestToTags: Record<string, string[]> = {
 function findBestMatch(selectedInterests: string[], selectedPriceRange?: string) {
   const selectedTags = selectedInterests.flatMap((interest) => interestToTags[interest] || [])
 
-  // Filter products by price range
-  let filteredProducts = productsData.products.filter(
-    (product: Product) => !selectedPriceRange || product.priceRange === selectedPriceRange,
-  )
+  // Get current currency
+  const currency =
+    typeof document !== 'undefined' ? document.documentElement.getAttribute('data-currency') || 'USD' : 'USD'
+
+  // Filter products by new price range logic
+  let filteredProducts = productsData.products.filter((product: Product) => {
+    if (!selectedPriceRange) return true
+    const price = currency === 'USD' ? product.price : product.priceEur
+    if (selectedPriceRange === 'low') return price < 30
+    if (selectedPriceRange === 'mid') return price >= 30 && price <= 80
+    if (selectedPriceRange === 'high') return price > 80
+    return true
+  })
 
   // If no interests selected, return a random product from filtered list
   if (selectedTags.length === 0) {
@@ -72,103 +96,120 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
 <section class="bg-[var(--background-color)] py-16">
   <div class="container">
     <div class="mx-auto max-w-3xl text-center">
-      <h2 class="mb-8 text-4xl font-bold text-[var(--foreground-color)]">Find the Perfect Gift</h2>
-      <p class="mb-12 text-xl text-[var(--foreground-color)]">
-        Select interests to help us match you with the ideal gift
+      <h2 class="mb-4 text-4xl font-bold text-[var(--foreground-color)]">Find the Perfect Gift</h2>
+      <p class="mb-8 text-lg text-[var(--foreground-color)]">
+        Select a price range and interests to get personalized gift ideas!
       </p>
-
-      <div class="mb-8">
-        <label class="mb-4 block text-lg font-semibold text-[var(--foreground-color)]">Price Range</label>
+      <form id="giftmatcher-form" autocomplete="off">
+        <fieldset class="mb-8" aria-labelledby="price-range-legend">
+          <legend id="price-range-legend" class="mb-4 block text-lg font-semibold text-[var(--foreground-color)]"
+            >Price Range</legend
+          >
+          <div class="flex flex-wrap justify-center gap-4">
+            <label class="relative inline-flex cursor-pointer items-center" aria-label="Any Price">
+              <input type="radio" class="peer sr-only" name="price-range" value="" checked />
+              <div
+                class="flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              >
+                <Icon class="price-any-icon" id="price-any-icon" name="lucide:dollar-sign" size="1.2em" />
+                <span id="price-any-label">Any Price</span>
+              </div>
+            </label>
+            <label class="relative inline-flex cursor-pointer items-center" aria-label="Low">
+              <input type="radio" class="peer sr-only" name="price-range" value="low" />
+              <div
+                class="price-low-label flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              >
+                <Icon id="price-low-icon" name="lucide:arrow-down-circle" size="1.2em" />
+                <span id="price-low-label">Low ($0 - $30)</span>
+              </div>
+            </label>
+            <label class="relative inline-flex cursor-pointer items-center" aria-label="Mid">
+              <input type="radio" class="peer sr-only" name="price-range" value="mid" />
+              <div
+                class="price-mid-label flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              >
+                <Icon id="price-mid-icon" name="lucide:arrow-up-circle" size="1.2em" />
+                <span id="price-mid-label">Mid ($30 - $80)</span>
+              </div>
+            </label>
+            <label class="relative inline-flex cursor-pointer items-center" aria-label="High">
+              <input type="radio" class="peer sr-only" name="price-range" value="high" />
+              <div
+                class="price-high-label flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              >
+                <Icon id="price-high-icon" name="lucide:trending-up" size="1.2em" />
+                <span id="price-high-label">High ($80+)</span>
+              </div>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="mb-12" aria-labelledby="interests-legend">
+          <legend id="interests-legend" class="mb-4 block text-lg font-semibold text-[var(--foreground-color)]"
+            >Interests</legend
+          >
+          <div class="flex flex-wrap justify-center gap-4">
+            {
+              interests.map((interest) => (
+                <label
+                  class="relative inline-flex cursor-pointer items-center"
+                  aria-label={interest.label}
+                  title={interest.label}
+                  tabindex="0"
+                >
+                  <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
+                  <div class="animate-selection flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
+                    <Icon name={interestIcons[interest.id] || 'lucide:star'} size="1.2em" /> {interest.label}
+                  </div>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
         <div class="flex flex-wrap justify-center gap-4">
-          <label class="relative inline-flex cursor-pointer items-center">
-            <input type="radio" class="peer sr-only" name="price-range" value="" checked />
-            <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
-            >
-              Any Price
-            </div>
-          </label>
-          <label class="relative inline-flex cursor-pointer items-center">
-            <input type="radio" class="peer sr-only" name="price-range" value="low" />
-            <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
-            >
-              Low ($0 - $50)
-            </div>
-          </label>
-          <label class="relative inline-flex cursor-pointer items-center">
-            <input type="radio" class="peer sr-only" name="price-range" value="mid" />
-            <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
-            >
-              Mid ($51 - $100)
-            </div>
-          </label>
-          <label class="relative inline-flex cursor-pointer items-center">
-            <input type="radio" class="peer sr-only" name="price-range" value="high" />
-            <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
-            >
-              High ($100+)
-            </div>
-          </label>
+          <button
+            id="gift-match-trigger"
+            class="button has-icon animate-press px-8 py-4 text-lg"
+            aria-label="Find a gift based on your selections"
+            title="Find a gift based on your selections"
+          >
+            <Icon name="lucide:gift" />
+            Match My Gift
+          </button>
+          <button
+            id="surprise-me-trigger"
+            class="button color-secondary has-icon animate-press px-8 py-4 text-lg"
+            aria-label="Show me a random gift idea"
+            title="Show me a random gift idea"
+          >
+            <Icon name="lucide:coffee" />
+            Surprise Me!
+          </button>
         </div>
-      </div>
-
-      <div class="mb-12">
-        <label class="mb-4 block text-lg font-semibold text-[var(--foreground-color)]">Interests</label>
-        <div class="flex flex-wrap justify-center gap-4">
-          {
-            interests.map((interest) => (
-              <label class="relative inline-flex cursor-pointer items-center">
-                <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
-                <div class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
-                  {interest.label}
-                </div>
-              </label>
-            ))
-          }
+        <div id="loading-spinner" class="mt-6 flex hidden justify-center"><span class="spinner"></span></div>
+        <div id="no-match-message" class="mt-6 hidden text-center text-red-500">
+          No matching products found for the selected criteria. Try broadening your selections!
         </div>
-      </div>
-
-      <!-- <div class="flex flex-col gap-3 min-[500px]:flex-row">
-        <a class="button has-icon" href="https://github.com/incluud/accessible-astro-starter" id="gift-match-trigger">
-          <Icon name="lucide:gift" />
-          Match My Gift
-        </a>
-        <a
-          class="button has-icon color-secondary"
-          href="https://accessible-astro.incluud.dev/"
-          id="surprise-me-trigger"
-        >
-          <Icon name="lucide:gift" />
-          Surprise Me!
-        </a>
-      </div> -->
-
-      <div class="flex flex-wrap justify-center gap-4">
-        <button id="gift-match-trigger" class="button has-icon px-8 py-4 text-lg">
-          <Icon name="lucide:gift" />
-          Match My Gift
-        </button>
-        <button id="surprise-me-trigger" class="button color-secondary has-icon px-8 py-4 text-lg">
-          <Icon name="lucide:coffee" />
-          Surprise Me!
-        </button>
-      </div>
+      </form>
     </div>
   </div>
 </section>
 
 <Modal triggerId="gift-match-trigger" title="Your Perfect Gift Match" closeText="Close" manual>
-  <div class="p-6">
+  <div class="modal-scroll p-6">
     <div id="gift-match-result" class="space-y-6">
       <div class="gift-modal-card flex flex-col items-center gap-6">
         <img id="gift-image" src="" alt="" class="h-48 w-full max-w-xs rounded-lg border object-cover" />
         <div class="flex-1 space-y-2 text-center">
           <h3 id="gift-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
+          <p class="font-semibold text-green-600">We think you'll love this!</p>
+          <p id="gift-description" class="text-base text-[var(--foreground-color)]"></p>
+          <div id="gift-tags" class="mb-2 flex flex-wrap justify-center gap-2"></div>
           <p id="gift-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
           <Badge id="gift-seller" type="info" />
+          <button id="gift-like-btn" aria-label="Like this gift" title="Like this gift" class="like-btn" tabindex="0"
+            >🤍</button
+          >
           <a
             id="gift-link"
             href="#"
@@ -183,14 +224,24 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
 </Modal>
 
 <Modal triggerId="surprise-me-trigger" title="Your Surprise Gift" closeText="Close">
-  <div class="p-6">
+  <div class="modal-scroll p-6">
     <div id="surprise-gift-result" class="space-y-6">
       <div class="gift-modal-card flex flex-col items-center gap-6">
         <img id="surprise-image" src="" alt="" class="h-48 w-full max-w-xs rounded-lg border object-cover" />
         <div class="flex-1 space-y-2 text-center">
           <h3 id="surprise-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
+          <p class="font-semibold text-green-600">Here's a fun surprise for you!</p>
+          <p id="surprise-description" class="text-base text-[var(--foreground-color)]"></p>
+          <div id="surprise-tags" class="mb-2 flex flex-wrap justify-center gap-2"></div>
           <p id="surprise-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
           <Badge id="surprise-seller" type="info" />
+          <button
+            id="surprise-like-btn"
+            aria-label="Like this gift"
+            title="Like this gift"
+            class="like-btn"
+            tabindex="0">🤍</button
+          >
           <a
             id="surprise-link"
             href="#"
@@ -216,6 +267,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     link: string
     seller: string
     tags: string[]
+    description?: string
   }
 
   // Initialize currency state
@@ -235,6 +287,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         link: 'https://example.com/ceramic-mug',
         seller: 'Artisan Pottery',
         tags: ['coffee', 'tea', 'handmade', 'ceramic', 'gift'],
+        description: 'A beautiful handmade ceramic mug, perfect for coffee or tea lovers.',
       },
       {
         id: 2,
@@ -246,6 +299,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         link: 'https://example.com/leather-journal',
         seller: 'Bookbinders Co',
         tags: ['writing', 'journal', 'leather', 'gift', 'creative'],
+        description: 'A premium leather journal for writing, sketching, or planning.',
       },
       {
         id: 3,
@@ -257,6 +311,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         link: 'https://example.com/wireless-earbuds',
         seller: 'TechGadgets',
         tags: ['tech', 'music', 'wireless', 'gift', 'audio'],
+        description: 'High-quality wireless earbuds with great sound and battery life.',
       },
       {
         id: 4,
@@ -268,6 +323,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         link: 'https://example.com/tea-set',
         seller: 'TeaTime',
         tags: ['tea', 'ceramic', 'gift', 'organic', 'coffee'],
+        description: 'A set of organic teas with a stylish ceramic teapot.',
       },
       {
         id: 5,
@@ -279,6 +335,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         link: 'https://example.com/smart-watch',
         seller: 'TechGadgets',
         tags: ['tech', 'fitness', 'gift', 'smart', 'health'],
+        description: 'A modern smart watch to track fitness, health, and notifications.',
       },
     ],
   }
@@ -301,10 +358,19 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   function findBestMatch(selectedInterests: string[], selectedPriceRange?: string) {
     const selectedTags = selectedInterests.flatMap((interest) => interestToTags[interest] || [])
 
-    // Filter products by price range
-    let filteredProducts = productsData.products.filter(
-      (product: Product) => !selectedPriceRange || product.priceRange === selectedPriceRange,
-    )
+    // Get current currency
+    const currency =
+      typeof document !== 'undefined' ? document.documentElement.getAttribute('data-currency') || 'USD' : 'USD'
+
+    // Filter products by new price range logic
+    let filteredProducts = productsData.products.filter((product: Product) => {
+      if (!selectedPriceRange) return true
+      const price = currency === 'USD' ? product.price : product.priceEur
+      if (selectedPriceRange === 'low') return price < 30
+      if (selectedPriceRange === 'mid') return price >= 30 && price <= 80
+      if (selectedPriceRange === 'high') return price > 80
+      return true
+    })
 
     // If no interests selected, return a random product from filtered list
     if (selectedTags.length === 0) {
@@ -324,67 +390,123 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   }
 
   function updateGiftMatch() {
-    const selectedInterests = Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(
-      (input) => (input as HTMLInputElement).value,
-    )
-    const selectedPriceRange = (document.querySelector('input[name="price-range"]:checked') as HTMLInputElement)?.value
+    const loadingSpinner = document.getElementById('loading-spinner')
+    const noMatchMsg = document.getElementById('no-match-message')
+    loadingSpinner?.classList.remove('hidden')
+    noMatchMsg?.classList.add('hidden')
+    setTimeout(() => {
+      // Simulate loading
+      const selectedInterests = Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(
+        (input) => (input as HTMLInputElement).value,
+      )
+      const selectedPriceRange = (document.querySelector('input[name="price-range"]:checked') as HTMLInputElement)
+        ?.value
 
-    // Find the best matching product
-    const bestMatch = findBestMatch(selectedInterests, selectedPriceRange)
+      // Find the best matching product
+      const bestMatch = findBestMatch(selectedInterests, selectedPriceRange)
 
-    if (!bestMatch) {
-      alert('No matching products found for the selected criteria')
-      return
-    }
+      loadingSpinner?.classList.add('hidden')
 
-    // Update the modal content
-    const imageElement = document.getElementById('gift-image') as HTMLImageElement
-    const titleElement = document.getElementById('gift-title')
-    const priceElement = document.getElementById('gift-price')
-    const sellerElement = document.getElementById('gift-seller')
-    const linkElement = document.getElementById('gift-link') as HTMLAnchorElement
+      if (!bestMatch) {
+        noMatchMsg?.classList.remove('hidden')
+        return
+      }
 
-    if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement) {
-      console.error('Could not find all required elements')
-      return
-    }
+      const imageElement = document.getElementById('gift-image') as HTMLImageElement | null
+      const titleElement = document.getElementById('gift-title') as HTMLElement | null
+      const priceElement = document.getElementById('gift-price') as HTMLElement | null
+      const sellerElement = document.getElementById('gift-seller') as HTMLElement | null
+      const linkElement = document.getElementById('gift-link') as HTMLAnchorElement | null
+      const descElement = document.getElementById('gift-description') as HTMLElement | null
+      const tagsElement = document.getElementById('gift-tags') as HTMLElement | null
 
-    imageElement.src = bestMatch.image
-    imageElement.alt = bestMatch.title
-    titleElement.textContent = bestMatch.title
-    updatePriceDisplay(priceElement, bestMatch)
-    sellerElement.textContent = bestMatch.seller
-    linkElement.href = bestMatch.link
+      if (
+        !imageElement ||
+        !titleElement ||
+        !priceElement ||
+        !sellerElement ||
+        !linkElement ||
+        !descElement ||
+        !tagsElement
+      ) {
+        console.error('Could not find all required elements')
+        return
+      }
 
-    // Open the modal manually
-    const modal = document.querySelector('[data-modal="gift-match-trigger"]') as HTMLElement
-    if (modal) {
-      modal.setAttribute('aria-hidden', 'false')
-      modal.classList.remove('hidden')
-    }
+      imageElement.src = bestMatch.image
+      imageElement.alt = bestMatch.title
+      descElement.textContent = bestMatch.description || ''
+      tagsElement.innerHTML = bestMatch.tags.map((tag) => `<span class='badge'>${tag}</span>`).join(' ')
+      titleElement.textContent = bestMatch.title
+      updatePriceDisplay(priceElement, bestMatch)
+      sellerElement.textContent = bestMatch.seller
+      linkElement.href = bestMatch.link
+
+      // Like button
+      const likeBtn = document.getElementById('gift-like-btn') as HTMLElement | null
+      if (likeBtn) {
+        likeBtn.onclick = () => {
+          likeBtn.textContent = likeBtn.textContent === '🤍' ? '💖' : '🤍'
+        }
+      }
+
+      // Open the modal manually
+      const modal = document.querySelector('[data-modal="gift-match-trigger"]') as HTMLElement | null
+      if (modal) {
+        modal.setAttribute('aria-hidden', 'false')
+        modal.classList.remove('hidden')
+        modal.classList.add('modal-animate')
+        setTimeout(() => modal.classList.remove('modal-animate'), 400)
+      }
+    }, 700)
   }
 
   function updateSurpriseGift() {
-    const randomProduct = getRandomProduct()
+    const loadingSpinner = document.getElementById('loading-spinner')
+    const noMatchMsg = document.getElementById('no-match-message')
+    loadingSpinner?.classList.remove('hidden')
+    noMatchMsg?.classList.add('hidden')
+    setTimeout(() => {
+      const randomProduct = getRandomProduct()
 
-    // Update the modal content
-    const imageElement = document.getElementById('surprise-image') as HTMLImageElement
-    const titleElement = document.getElementById('surprise-title')
-    const priceElement = document.getElementById('surprise-price')
-    const sellerElement = document.getElementById('surprise-seller')
-    const linkElement = document.getElementById('surprise-link') as HTMLAnchorElement
+      const imageElement = document.getElementById('surprise-image') as HTMLImageElement | null
+      const titleElement = document.getElementById('surprise-title') as HTMLElement | null
+      const priceElement = document.getElementById('surprise-price') as HTMLElement | null
+      const sellerElement = document.getElementById('surprise-seller') as HTMLElement | null
+      const linkElement = document.getElementById('surprise-link') as HTMLAnchorElement | null
+      const descElement = document.getElementById('surprise-description') as HTMLElement | null
+      const tagsElement = document.getElementById('surprise-tags') as HTMLElement | null
 
-    if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement) {
-      console.error('Could not find all required elements')
-      return
-    }
+      if (
+        !imageElement ||
+        !titleElement ||
+        !priceElement ||
+        !sellerElement ||
+        !linkElement ||
+        !descElement ||
+        !tagsElement
+      ) {
+        console.error('Could not find all required elements')
+        return
+      }
 
-    imageElement.src = randomProduct.image
-    imageElement.alt = randomProduct.title
-    titleElement.textContent = randomProduct.title
-    updatePriceDisplay(priceElement, randomProduct)
-    sellerElement.textContent = randomProduct.seller
-    linkElement.href = randomProduct.link
+      imageElement.src = randomProduct.image
+      imageElement.alt = randomProduct.title
+      descElement.textContent = randomProduct.description || ''
+      tagsElement.innerHTML = randomProduct.tags.map((tag) => `<span class='badge'>${tag}</span>`).join(' ')
+      titleElement.textContent = randomProduct.title
+      updatePriceDisplay(priceElement, randomProduct)
+      sellerElement.textContent = randomProduct.seller
+      linkElement.href = randomProduct.link
+
+      // Like button
+      const likeBtn = document.getElementById('surprise-like-btn') as HTMLElement | null
+      if (likeBtn) {
+        likeBtn.onclick = () => {
+          likeBtn.textContent = likeBtn.textContent === '🤍' ? '💖' : '🤍'
+        }
+      }
+    }, 700)
   }
 
   function updatePriceDisplay(element: HTMLElement, product: Product) {
@@ -463,6 +585,41 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
       }
     }
   })
+
+  // Animate selection changes
+  document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((input) => {
+    input.addEventListener('change', (e) => {
+      const div = (e.target as HTMLInputElement).nextElementSibling as HTMLElement | null
+      if (div) {
+        div.classList.add('animate-selection')
+        setTimeout(() => div.classList.remove('animate-selection'), 400)
+      }
+    })
+  })
+
+  // --- Dynamic price range labels and icons by currency ---
+  function updatePriceRangeLabels() {
+    const currency = document.documentElement.getAttribute('data-currency') || 'USD'
+    const symbol = currency === 'USD' ? '$' : '€'
+    const icon = currency === 'USD' ? 'lucide:dollar-sign' : 'lucide:euro'
+    // Update Any Price icon
+    const anyIcon = document.getElementById('price-any-icon')
+    if (anyIcon) anyIcon.setAttribute('name', icon)
+    // Update Low label
+    const lowLabel = document.getElementById('price-low-label')
+    if (lowLabel) lowLabel.textContent = `Low (${symbol}0 - ${symbol}30)`
+    // Update Mid label
+    const midLabel = document.getElementById('price-mid-label')
+    if (midLabel) midLabel.textContent = `Mid (${symbol}30 - ${symbol}80)`
+    // Update High label
+    const highLabel = document.getElementById('price-high-label')
+    if (highLabel) highLabel.textContent = `High (${symbol}80+)`
+  }
+
+  // Call on load
+  document.addEventListener('DOMContentLoaded', updatePriceRangeLabels)
+  // Listen for currency change
+  window.addEventListener('currencyChange', updatePriceRangeLabels)
 </script>
 
 <style>
@@ -533,5 +690,87 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   input[type='radio']:not(:checked):active + div {
     background-color: transparent !important;
     color: var(--link-color) !important;
+  }
+
+  .modal-scroll {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .badge {
+    display: inline-block;
+    margin: 0 0.15em;
+    border-radius: 9999px;
+    background: var(--link-color);
+    padding: 0.25em 0.75em;
+    color: var(--color-neutral-100);
+    font-size: 0.9em;
+  }
+  .like-btn {
+    transition: transform 0.1s;
+    cursor: pointer;
+    margin: 0.5em 0;
+    border: none;
+    background: none;
+    font-size: 2rem;
+  }
+  .like-btn:active {
+    transform: scale(1.2);
+  }
+  .helper-text {
+    color: var(--link-color);
+    font-size: 0.85em;
+  }
+  .spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--link-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  .animate-selection {
+    animation: selectionPop 0.4s;
+  }
+  @keyframes selectionPop {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.12);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .animate-press:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+  }
+  .modal-animate {
+    animation: modalFadeIn 0.4s;
+  }
+  @keyframes modalFadeIn {
+    0% {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @media (max-width: 600px) {
+    .modal-scroll {
+      max-height: 60vh;
+    }
   }
 </style>
