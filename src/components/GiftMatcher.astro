@@ -526,4 +526,12 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
       color: var(--link-color) !important;
     }
   }
+
+  input[type='checkbox']:not(:checked):focus + div,
+  input[type='checkbox']:not(:checked):active + div,
+  input[type='radio']:not(:checked):focus + div,
+  input[type='radio']:not(:checked):active + div {
+    background-color: transparent !important;
+    color: var(--link-color) !important;
+  }
 </style>
