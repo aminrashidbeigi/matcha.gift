@@ -62,6 +62,9 @@ const { class: className } = Astro.props
 
       mobileNavigation.classList.toggle('show')
       mobileNavigation.classList.contains('show') ? openMenu(responsiveToggle) : closeMenu(responsiveToggle)
+
+      // Dispatch event to update currency toggle in mobile menu
+      window.dispatchEvent(new Event('mobileMenuToggled'))
     })
   })
 </script>

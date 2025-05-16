@@ -118,30 +118,32 @@ import { Icon } from 'astro-icon/components'
   function initCurrency() {
     const currentCurrency = localStorage.getItem('currency') || 'EUR'
     document.documentElement.setAttribute('data-currency', currentCurrency)
-    const toggle = document.getElementById('currency-toggle')
-    if (toggle) {
+    // Set on all currency-toggle buttons
+    document.querySelectorAll('.currency-toggle').forEach((toggle) => {
       toggle.setAttribute('data-currency', currentCurrency)
-    }
+    })
   }
 
   // Initialize on page load
   initCurrency()
 
   // Handle currency toggle
-  document.getElementById('currency-toggle')?.addEventListener('click', () => {
-    const currentCurrency = document.documentElement.getAttribute('data-currency')
-    const newCurrency = currentCurrency === 'USD' ? 'EUR' : 'USD'
-
-    localStorage.setItem('currency', newCurrency)
-    document.documentElement.setAttribute('data-currency', newCurrency)
-    const toggle = document.getElementById('currency-toggle')
-    if (toggle) {
-      toggle.setAttribute('data-currency', newCurrency)
-    }
-
-    window.dispatchEvent(new CustomEvent('currencyChange', { detail: newCurrency }))
+  document.querySelectorAll('.currency-toggle').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const currentCurrency = document.documentElement.getAttribute('data-currency')
+      const newCurrency = currentCurrency === 'USD' ? 'EUR' : 'USD'
+      localStorage.setItem('currency', newCurrency)
+      document.documentElement.setAttribute('data-currency', newCurrency)
+      document.querySelectorAll('.currency-toggle').forEach((btn) => {
+        btn.setAttribute('data-currency', newCurrency)
+      })
+      window.dispatchEvent(new CustomEvent('currencyChange', { detail: newCurrency }))
+    })
   })
 
   // Re-initialize on navigation
   document.addEventListener('astro:page-load', initCurrency)
+
+  // Listen for the 'mobileMenuToggled' event and call initCurrency
+  window.addEventListener('mobileMenuToggled', initCurrency)
 </script>
