@@ -83,7 +83,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="" checked />
             <div
-              class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               Any Price
             </div>
@@ -91,7 +91,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="low" />
             <div
-              class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               Low ($0 - $50)
             </div>
@@ -99,7 +99,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="mid" />
             <div
-              class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               Mid ($51 - $100)
             </div>
@@ -107,7 +107,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="high" />
             <div
-              class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               High ($100+)
             </div>
@@ -122,7 +122,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
             interests.map((interest) => (
               <label class="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
-                <div class="rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
+                <div class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
                   {interest.label}
                 </div>
               </label>
@@ -481,5 +481,30 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  /* Add these new styles */
+  input[type='radio'],
+  input[type='checkbox'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Fix for mobile Chrome */
+  @media (hover: none) {
+    input[type='checkbox']:checked + div,
+    input[type='radio']:checked + div {
+      background-color: var(--link-color) !important;
+      color: var(--color-neutral-100) !important;
+    }
+    input[type='checkbox']:not(:checked) + div,
+    input[type='radio']:not(:checked) + div {
+      background-color: transparent !important;
+      color: var(--link-color) !important;
+    }
   }
 </style>
