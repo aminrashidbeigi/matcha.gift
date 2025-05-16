@@ -83,7 +83,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="" checked />
             <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               Any Price
             </div>
@@ -91,7 +91,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="low" />
             <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               Low ($0 - $50)
             </div>
@@ -99,7 +99,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="mid" />
             <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               Mid ($51 - $100)
             </div>
@@ -107,7 +107,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           <label class="relative inline-flex cursor-pointer items-center">
             <input type="radio" class="peer sr-only" name="price-range" value="high" />
             <div
-              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
+              class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]"
             >
               High ($100+)
             </div>
@@ -122,7 +122,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
             interests.map((interest) => (
               <label class="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
-                <div class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[var(--color-neutral-100)] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
+                <div class="touch-manipulation rounded-full border-2 border-[var(--link-color)] px-6 py-3 text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
                   {interest.label}
                 </div>
               </label>
@@ -492,6 +492,9 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 0.2s ease-in-out,
+      color 0.2s ease-in-out;
   }
 
   /* Fix for mobile Chrome */
@@ -503,6 +506,22 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     }
     input[type='checkbox']:not(:checked) + div,
     input[type='radio']:not(:checked) + div {
+      background-color: transparent !important;
+      color: var(--link-color) !important;
+    }
+    .darkmode input[type='checkbox']:checked + div,
+    .darkmode input[type='radio']:checked + div {
+      color: var(--color-neutral-900) !important;
+    }
+
+    /* Add these new rules to fix the touch state */
+    input[type='checkbox']:active + div,
+    input[type='radio']:active + div {
+      transition: none;
+    }
+
+    input[type='checkbox']:not(:checked):active + div,
+    input[type='radio']:not(:checked):active + div {
       background-color: transparent !important;
       color: var(--link-color) !important;
     }
