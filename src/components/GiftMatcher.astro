@@ -100,7 +100,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
       <p class="mb-8 text-lg text-[var(--foreground-color)]">
         Select a price range and interests to get personalized gift ideas!
       </p>
-      <form id="giftmatcher-form" autocomplete="off">
+      <form id="giftmatcher-form" autocomplete="off" onsubmit="event.preventDefault()">
         <fieldset class="mb-8" aria-labelledby="price-range-legend">
           <legend id="price-range-legend" class="mb-4 block text-lg font-semibold text-[var(--foreground-color)]"
             >Price Range</legend
@@ -158,7 +158,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
                   tabindex="0"
                 >
                   <input type="checkbox" class="peer sr-only" name="interests" value={interest.id} />
-                  <div class="animate-selection flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
+                  <div class="flex touch-manipulation items-center gap-2 rounded-full border-2 border-[var(--link-color)] px-4 py-2 text-base text-[var(--link-color)] transition-colors duration-200 peer-not-checked:bg-transparent peer-not-checked:text-[var(--link-color)] peer-checked:bg-[var(--link-color)] peer-checked:text-[light-dark(var(--color-neutral-100),var(--color-neutral-900))] hover:bg-[var(--link-hover-color)] active:bg-[var(--link-hover-color)]">
                     <Icon name={interestIcons[interest.id] || 'lucide:star'} size="1.2em" /> {interest.label}
                   </div>
                 </label>
@@ -169,6 +169,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
         <div class="flex flex-wrap justify-center gap-4">
           <button
             id="gift-match-trigger"
+            type="button"
             class="button has-icon animate-press px-8 py-4 text-lg"
             aria-label="Find a gift based on your selections"
             title="Find a gift based on your selections"
@@ -178,6 +179,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
           </button>
           <button
             id="surprise-me-trigger"
+            type="button"
             class="button color-secondary has-icon animate-press px-8 py-4 text-lg"
             aria-label="Show me a random gift idea"
             title="Show me a random gift idea"
@@ -586,17 +588,6 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     }
   })
 
-  // Animate selection changes
-  document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((input) => {
-    input.addEventListener('change', (e) => {
-      const div = (e.target as HTMLInputElement).nextElementSibling as HTMLElement | null
-      if (div) {
-        div.classList.add('animate-selection')
-        setTimeout(() => div.classList.remove('animate-selection'), 400)
-      }
-    })
-  })
-
   // --- Dynamic price range labels and icons by currency ---
   function updatePriceRangeLabels() {
     const currency = document.documentElement.getAttribute('data-currency') || 'USD'
@@ -735,20 +726,6 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     }
     100% {
       transform: rotate(360deg);
-    }
-  }
-  .animate-selection {
-    animation: selectionPop 0.4s;
-  }
-  @keyframes selectionPop {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.12);
-    }
-    100% {
-      transform: scale(1);
     }
   }
   .animate-press:active {
