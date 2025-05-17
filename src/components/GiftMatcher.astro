@@ -200,26 +200,16 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
 <Modal triggerId="gift-match-trigger" title="Your Perfect Gift Match" closeText="Close" manual>
   <div class="modal-scroll p-6">
     <div id="gift-match-result" class="space-y-6">
-      <div class="gift-modal-card flex flex-col items-center gap-6">
-        <img id="gift-image" src="" alt="" class="h-48 w-full max-w-xs rounded-lg border object-cover" />
-        <div class="flex-1 space-y-2 text-center">
-          <h3 id="gift-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
-          <p class="font-semibold text-green-600">We think you'll love this!</p>
-          <p id="gift-description" class="text-base text-[var(--foreground-color)]"></p>
-          <div id="gift-tags" class="mb-2 flex flex-wrap justify-center gap-2"></div>
-          <p id="gift-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
-          <Badge id="gift-seller" type="info" />
-          <button id="gift-like-btn" aria-label="Like this gift" title="Like this gift" class="like-btn" tabindex="0"
-            >🤍</button
-          >
-          <a
-            id="gift-link"
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="button button-primary mt-4 block w-full text-center">View Product</a
-          >
-        </div>
+      <div id="gift-loading" class="flex justify-center py-8">
+        <span class="spinner"></span>
+      </div>
+      <div id="gift-content" class="modern-product-modal hidden">
+        <img id="gift-image" src="" alt="" class="modern-product-image" />
+        <h3 id="gift-title" class="modern-product-title"></h3>
+        <p id="gift-description" class="modern-product-desc"></p>
+        <p id="gift-price" class="modern-product-price"></p>
+        <Badge id="gift-seller" type="info" class="modern-product-seller" />
+        <a id="gift-link" href="#" target="_blank" rel="noopener noreferrer" class="modern-product-btn">View Product</a>
       </div>
     </div>
   </div>
@@ -228,30 +218,18 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
 <Modal triggerId="surprise-me-trigger" title="Your Surprise Gift" closeText="Close">
   <div class="modal-scroll p-6">
     <div id="surprise-gift-result" class="space-y-6">
-      <div class="gift-modal-card flex flex-col items-center gap-6">
-        <img id="surprise-image" src="" alt="" class="h-48 w-full max-w-xs rounded-lg border object-cover" />
-        <div class="flex-1 space-y-2 text-center">
-          <h3 id="surprise-title" class="text-2xl font-bold text-[var(--foreground-color)]"></h3>
-          <p class="font-semibold text-green-600">Here's a fun surprise for you!</p>
-          <p id="surprise-description" class="text-base text-[var(--foreground-color)]"></p>
-          <div id="surprise-tags" class="mb-2 flex flex-wrap justify-center gap-2"></div>
-          <p id="surprise-price" class="text-xl font-semibold text-[var(--foreground-color)]"></p>
-          <Badge id="surprise-seller" type="info" />
-          <button
-            id="surprise-like-btn"
-            aria-label="Like this gift"
-            title="Like this gift"
-            class="like-btn"
-            tabindex="0">🤍</button
-          >
-          <a
-            id="surprise-link"
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="button button-primary mt-4 block w-full text-center">View Product</a
-          >
-        </div>
+      <div id="surprise-loading" class="flex justify-center py-8">
+        <span class="spinner"></span>
+      </div>
+      <div id="surprise-content" class="modern-product-modal hidden">
+        <img id="surprise-image" src="" alt="" class="modern-product-image" />
+        <h3 id="surprise-title" class="modern-product-title"></h3>
+        <p id="surprise-description" class="modern-product-desc"></p>
+        <p id="surprise-price" class="modern-product-price"></p>
+        <Badge id="surprise-seller" type="info" class="modern-product-seller" />
+        <a id="surprise-link" href="#" target="_blank" rel="noopener noreferrer" class="modern-product-btn"
+          >View Product</a
+        >
       </div>
     </div>
   </div>
@@ -392,10 +370,12 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   }
 
   function updateGiftMatch() {
-    const loadingSpinner = document.getElementById('loading-spinner')
     const noMatchMsg = document.getElementById('no-match-message')
-    loadingSpinner?.classList.remove('hidden')
+    const giftLoading = document.getElementById('gift-loading')
+    const giftContent = document.getElementById('gift-content')
     noMatchMsg?.classList.add('hidden')
+    giftLoading?.classList.remove('hidden')
+    giftContent?.classList.add('hidden')
     setTimeout(() => {
       // Simulate loading
       const selectedInterests = Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(
@@ -407,9 +387,8 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
       // Find the best matching product
       const bestMatch = findBestMatch(selectedInterests, selectedPriceRange)
 
-      loadingSpinner?.classList.add('hidden')
-
       if (!bestMatch) {
+        giftLoading?.classList.add('hidden')
         noMatchMsg?.classList.remove('hidden')
         return
       }
@@ -420,37 +399,29 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
       const sellerElement = document.getElementById('gift-seller') as HTMLElement | null
       const linkElement = document.getElementById('gift-link') as HTMLAnchorElement | null
       const descElement = document.getElementById('gift-description') as HTMLElement | null
-      const tagsElement = document.getElementById('gift-tags') as HTMLElement | null
 
-      if (
-        !imageElement ||
-        !titleElement ||
-        !priceElement ||
-        !sellerElement ||
-        !linkElement ||
-        !descElement ||
-        !tagsElement
-      ) {
+      if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement || !descElement) {
+        giftLoading?.classList.add('hidden')
         console.error('Could not find all required elements')
         return
       }
 
-      imageElement.src = bestMatch.image
-      imageElement.alt = bestMatch.title
-      descElement.textContent = bestMatch.description || ''
-      tagsElement.innerHTML = bestMatch.tags.map((tag) => `<span class='badge'>${tag}</span>`).join(' ')
-      titleElement.textContent = bestMatch.title
-      updatePriceDisplay(priceElement, bestMatch)
-      sellerElement.textContent = bestMatch.seller
-      linkElement.href = bestMatch.link
+      // Load the image first
+      const img = new Image()
+      img.onload = () => {
+        imageElement.src = bestMatch.image
+        imageElement.alt = bestMatch.title
+        descElement.textContent = bestMatch.description || ''
+        titleElement.textContent = bestMatch.title
+        updatePriceDisplay(priceElement, bestMatch)
+        sellerElement.textContent = bestMatch.seller
+        linkElement.href = bestMatch.link
 
-      // Like button
-      const likeBtn = document.getElementById('gift-like-btn') as HTMLElement | null
-      if (likeBtn) {
-        likeBtn.onclick = () => {
-          likeBtn.textContent = likeBtn.textContent === '🤍' ? '💖' : '🤍'
-        }
+        // Hide loading and show content
+        giftLoading?.classList.add('hidden')
+        giftContent?.classList.remove('hidden')
       }
+      img.src = bestMatch.image
 
       // Open the modal manually
       const modal = document.querySelector('[data-modal="gift-match-trigger"]') as HTMLElement | null
@@ -464,10 +435,12 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   }
 
   function updateSurpriseGift() {
-    const loadingSpinner = document.getElementById('loading-spinner')
     const noMatchMsg = document.getElementById('no-match-message')
-    loadingSpinner?.classList.remove('hidden')
+    const surpriseLoading = document.getElementById('surprise-loading')
+    const surpriseContent = document.getElementById('surprise-content')
     noMatchMsg?.classList.add('hidden')
+    surpriseLoading?.classList.remove('hidden')
+    surpriseContent?.classList.add('hidden')
     setTimeout(() => {
       const randomProduct = getRandomProduct()
 
@@ -477,37 +450,29 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
       const sellerElement = document.getElementById('surprise-seller') as HTMLElement | null
       const linkElement = document.getElementById('surprise-link') as HTMLAnchorElement | null
       const descElement = document.getElementById('surprise-description') as HTMLElement | null
-      const tagsElement = document.getElementById('surprise-tags') as HTMLElement | null
 
-      if (
-        !imageElement ||
-        !titleElement ||
-        !priceElement ||
-        !sellerElement ||
-        !linkElement ||
-        !descElement ||
-        !tagsElement
-      ) {
+      if (!imageElement || !titleElement || !priceElement || !sellerElement || !linkElement || !descElement) {
+        surpriseLoading?.classList.add('hidden')
         console.error('Could not find all required elements')
         return
       }
 
-      imageElement.src = randomProduct.image
-      imageElement.alt = randomProduct.title
-      descElement.textContent = randomProduct.description || ''
-      tagsElement.innerHTML = randomProduct.tags.map((tag) => `<span class='badge'>${tag}</span>`).join(' ')
-      titleElement.textContent = randomProduct.title
-      updatePriceDisplay(priceElement, randomProduct)
-      sellerElement.textContent = randomProduct.seller
-      linkElement.href = randomProduct.link
+      // Load the image first
+      const img = new Image()
+      img.onload = () => {
+        imageElement.src = randomProduct.image
+        imageElement.alt = randomProduct.title
+        descElement.textContent = randomProduct.description || ''
+        titleElement.textContent = randomProduct.title
+        updatePriceDisplay(priceElement, randomProduct)
+        sellerElement.textContent = randomProduct.seller
+        linkElement.href = randomProduct.link
 
-      // Like button
-      const likeBtn = document.getElementById('surprise-like-btn') as HTMLElement | null
-      if (likeBtn) {
-        likeBtn.onclick = () => {
-          likeBtn.textContent = likeBtn.textContent === '🤍' ? '💖' : '🤍'
-        }
+        // Hide loading and show content
+        surpriseLoading?.classList.add('hidden')
+        surpriseContent?.classList.remove('hidden')
       }
+      img.src = randomProduct.image
     }, 700)
   }
 
@@ -684,6 +649,9 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   }
 
   .modal-scroll {
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
     max-height: 80vh;
     overflow-y: auto;
   }
@@ -714,7 +682,7 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   .spinner {
     display: inline-block;
     animation: spin 1s linear infinite;
-    border: 4px solid #f3f3f3;
+    border: 4px solid var(--color-neutral-200);
     border-top: 4px solid var(--link-color);
     border-radius: 50%;
     width: 32px;
@@ -726,6 +694,12 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
     }
     100% {
       transform: rotate(360deg);
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    .spinner {
+      border: 4px solid var(--color-neutral-800);
+      border-top: 4px solid var(--link-color);
     }
   }
   .animate-press:active {
@@ -748,6 +722,113 @@ function findBestMatch(selectedInterests: string[], selectedPriceRange?: string)
   @media (max-width: 600px) {
     .modal-scroll {
       max-height: 60vh;
+    }
+  }
+  /* Center modal spinner vertically and horizontally */
+  #gift-loading,
+  #surprise-loading {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 350px;
+  }
+  .hidden {
+    display: none !important;
+  }
+  .modern-product-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+    margin: 0 auto;
+    box-shadow: none;
+    border-radius: 1.5rem;
+    background: none;
+    padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+    max-width: 420px;
+  }
+  .modern-product-image {
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.1);
+    border: 1.5px solid var(--color-neutral-200);
+    border-radius: 1.25rem;
+    width: 100%;
+    max-width: 350px;
+    height: 150px;
+    object-fit: cover;
+  }
+  .modern-product-title {
+    margin: 0.3rem 0 0.1rem 0;
+    color: var(--foreground-color);
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+  }
+  .modern-product-desc {
+    margin-top: 0;
+    margin-bottom: 0.2rem;
+    color: var(--color-neutral-700);
+    font-size: 1rem;
+  }
+  .modern-product-price {
+    display: inline-block;
+    margin: 0.2rem 0 0.2rem 0;
+    border-radius: 0.75rem;
+    background: var(--color-neutral-100);
+    padding: 0.25em 0.8em;
+    color: var(--foreground-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .modern-product-seller {
+    margin-top: 0.1rem;
+    margin-bottom: 0.2rem;
+    box-shadow: none;
+    border-radius: 9999px;
+    background: var(--color-neutral-200);
+    padding: 0.2em 0.7em;
+    color: var(--link-color);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .modern-product-btn {
+    display: block;
+    transition:
+      background 0.18s,
+      color 0.18s,
+      box-shadow 0.18s;
+    margin-top: 0.7rem;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
+    border: none;
+    border-radius: 0.75rem;
+    background: var(--link-color);
+    padding: 0.7rem 0;
+    width: 100%;
+    color: var(--color-neutral-100);
+    font-weight: 700;
+    font-size: 1.05rem;
+    text-align: center;
+  }
+  @media (max-width: 600px) {
+    .modern-product-modal {
+      padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+      max-width: 99vw;
+    }
+    .modern-product-image {
+      max-width: 99vw;
+      height: 110px;
+    }
+    .modern-product-title {
+      font-size: 1.05rem;
+    }
+    .modern-product-price {
+      padding: 0.18em 0.5em;
+      font-size: 0.95rem;
+    }
+    .modern-product-btn {
+      padding: 0.5rem 0;
+      font-size: 0.95rem;
     }
   }
 </style>
