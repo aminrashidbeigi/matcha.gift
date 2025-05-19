@@ -24,6 +24,21 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <SiteMeta title={title} description={description.substring(0, 100)} url={url} image={image} author={author} />
+
+    {import.meta.env.PROD && (
+      <>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-G15EVDJ36K" is:inline></script>
+        <script is:inline>
+          window.dataLayer = window.dataLayer || []
+          function gtag() {
+            dataLayer.push(arguments)
+          }
+          gtag('js', new Date())
+          gtag('config', 'G-G15EVDJ36K')
+        </script>
+      </>
+    )}
   </head>
   <body>
     <Header />
