@@ -1,0 +1,17 @@
+---
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import GiftMatcher from '@components/GiftMatcher.astro'
+---
+
+<DefaultLayout title="Home">
+  <!-- <Hero /> -->
+  <GiftMatcher />
+</DefaultLayout>
+
+<style>
+  .avatar {
+    border: 1px solid var(--border-color-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-s);
+  }
+</style>
