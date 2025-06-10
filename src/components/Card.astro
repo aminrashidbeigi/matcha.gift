@@ -1,0 +1,117 @@
+---
+import type { Product } from '../lib/api/gifts'
+
+interface Props {
+  product: Product
+  currency: string
+  showSeller?: boolean
+  showTags?: boolean
+  showButton?: boolean
+  buttonText?: string
+  buttonLink?: string
+  onSelect?: () => void
+  isSelected?: boolean
+}
+
+const {
+  product,
+  currency,
+  showSeller = false,
+  showTags = false,
+  showButton = true,
+  buttonText = 'View Gift',
+  buttonLink,
+  isSelected = false,
+} = Astro.props
+
+const price = currency === 'dollar' ? `$${product.priceDlr}` : `€${product.priceEur}`
+---
+
+<div
+  class:list={[
+    'gift-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg',
+    { 'ring-2 ring-[var(--link-color)]': isSelected }
+  ]}
+>
+  <div class="relative aspect-square overflow-hidden">
+    <img
+      src={product.image}
+      alt={product.title}
+      class="h-full w-full object-cover transition-transform group-hover:scale-105"
+    />
+    <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5"></div>
+  </div>
+  <div class="p-4">
+    <h3 class="mb-1 line-clamp-2 text-lg font-semibold">{product.title}</h3>
+    
+    {showSeller && product.seller && (
+      <p class="mb-2 text-sm text-gray-600">by {product.seller}</p>
+    )}
+    
+    <p class="text-sm text-gray-600">{price}</p>
+    
+    {showTags && product.tags && product.tags.length > 0 && (
+      <div class="mt-2 flex items-center justify-between">
+        <div class="flex flex-wrap gap-1">
+          {product.tags.map((tag) => (
+            <span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
+              {tag.name}
+            </span>
+          ))}
+        </div>
+        {showSeller && product.seller && (
+          <span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 whitespace-nowrap">
+            Seller: {product.seller}
+          </span>
+        )}
+      </div>
+    )}
+    
+    {showButton && (
+      <a
+        href={buttonLink || product.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-4 block w-full rounded-lg bg-[var(--link-color)] px-4 py-2 text-center text-white transition-colors hover:bg-[var(--link-color-hover)]"
+      >
+        {buttonText}
+      </a>
+    )}
+  </div>
+</div>
+
+<style>
+  .gift-card {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .gift-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .gift-card img {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .gift-card:hover img {
+    transform: scale(1.05);
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .seller-badge {
+    background-color: #f3e8ff;
+    color: #7c3aed;
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin-left: 0.5rem;
+  }
+</style> 

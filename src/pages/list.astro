@@ -1,0 +1,310 @@
+---
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import type { Product } from '../lib/api/gifts'
+import Card from '../components/Card.astro'
+---
+
+<DefaultLayout title="Your Gift List">
+  <section class="bg-[var(--background-color)] py-16">
+    <div class="container">
+      <div class="mx-auto max-w-6xl">
+        <div class="mb-8 flex items-center justify-between">
+          <h1 class="text-4xl font-bold text-[var(--foreground-color)]">Your Personalized Gift List</h1>
+          <div class="flex gap-2">
+            <button
+              id="urgent-delivery-btn"
+              onclick="window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'delivery=below_day'"
+              class="button has-icon inline-flex items-center gap-2 px-4 py-2 text-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Urgent Delivery</span>
+            </button>
+            <button
+              id="cheaper-gifts-btn"
+              onclick="window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'priceRange=low'"
+              class="button has-icon inline-flex items-center gap-2 px-4 py-2 text-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+              >
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>Cheaper Gifts</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Initial Loading State -->
+        <div id="initial-loading" class="flex justify-center">
+          <span class="spinner"></span>
+        </div>
+
+        <!-- Gift Grid -->
+        <div id="gift-grid" class="grid hidden grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"></div>
+
+        <!-- Show More Button -->
+        <div id="show-more-container" class="mt-8 hidden text-center">
+          <button
+            id="show-more-btn"
+            class="button has-icon animate-press inline-flex items-center gap-2 px-6 py-2 text-base"
+            data-offset="3"
+          >
+            <span>Show More</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-5 w-5"
+            >
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-spinner" class="mt-6 flex hidden justify-center">
+          <span class="spinner"></span>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="no-results-message" class="mt-6 hidden text-center text-red-500">
+          No gifts found matching your criteria. Try adjusting your filters!
+        </div>
+      </div>
+    </div>
+  </section>
+</DefaultLayout>
+
+<script>
+  import { fetchGifts } from '../lib/api/gifts'
+
+  let isLoading = false
+  let currentCurrency = 'dollar'
+
+  // Check URL parameters for button visibility
+  const url = new URL(window.location.href)
+  const priceRange = url.searchParams.get('priceRange')
+  const delivery = url.searchParams.get('delivery')
+
+  const cheaperGiftsBtn = document.getElementById('cheaper-gifts-btn')
+  const urgentDeliveryBtn = document.getElementById('urgent-delivery-btn')
+
+  if (cheaperGiftsBtn && priceRange === 'low') {
+    cheaperGiftsBtn.style.display = 'none'
+  }
+
+  if (urgentDeliveryBtn && delivery === 'below_day') {
+    urgentDeliveryBtn.style.display = 'none'
+  }
+
+  // Function to create a gift card element
+  function createGiftCard(product: any, currency: string) {
+    const card = document.createElement('div')
+    card.className =
+      'gift-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg'
+
+    // Build tags and seller badge HTML
+    let tagsHtml = ''
+    if (product.tags && product.tags.length > 0) {
+      tagsHtml += `<div class="mt-2 flex items-center justify-between">`
+      tagsHtml += `<div class="flex flex-wrap gap-1">`
+      tagsHtml += product.tags
+        .map((tag: any) => `<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">${tag.name}</span>`)
+        .join('')
+      tagsHtml += `</div>`
+      if (product.seller) {
+        tagsHtml += `<span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 whitespace-nowrap">${product.seller}</span>`
+      }
+      tagsHtml += `</div>`
+    } else if (product.seller) {
+      tagsHtml += `<div class="mt-2 flex justify-end">`
+      tagsHtml += `<span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 whitespace-nowrap">${product.seller}</span>`
+      tagsHtml += `</div>`
+    }
+
+    card.innerHTML = `
+      <div class="relative aspect-square overflow-hidden">
+        <img
+          src="${product.image}"
+          alt="${product.title}"
+          class="h-full w-full object-cover transition-transform group-hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5"></div>
+      </div>
+      <div class="p-4">
+        <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
+        <p class="text-sm text-gray-600">
+          ${currency === 'dollar' ? `$${product.priceDlr}` : `€${product.priceEur}`}
+        </p>
+        ${tagsHtml}
+        <div class="mt-4 flex justify-center">
+          <button
+            onclick="window.open('${product.link}', '_blank')"
+            class="button has-icon rounded-lg px-4 py-2 text-center text-white text-base font-semibold transition-colors hover:bg-[var(--link-color-hover)]"
+            type="button"
+          >
+            View Gift
+          </button>
+        </div>
+      </div>
+    `
+
+    return card
+  }
+
+  async function loadGifts(offset: number = 0) {
+    const loading = document.getElementById('loading-spinner')
+    const initialLoading = document.getElementById('initial-loading')
+    const noResults = document.getElementById('no-results-message')
+    const showMoreBtn = document.getElementById('show-more-btn')
+    const showMoreContainer = document.getElementById('show-more-container')
+    const grid = document.getElementById('gift-grid')
+
+    if (!loading || !noResults || !showMoreBtn || !grid || !showMoreContainer || !initialLoading || isLoading) return
+
+    try {
+      isLoading = true
+      if (offset === 0) {
+        initialLoading.classList.remove('hidden')
+      } else {
+        loading.classList.remove('hidden')
+        showMoreBtn.classList.add('hidden')
+      }
+
+      // Get URL parameters
+      const url = new URL(window.location.href)
+      const tags = url.searchParams.get('tags')?.split(',').filter(Boolean) || []
+      const delivery = url.searchParams.get('delivery') || undefined
+      const priceRange = url.searchParams.get('priceRange')
+
+      // Transform price range parameter
+      let priceFilter: string | undefined
+      if (priceRange) {
+        const prices = priceRange.split(',')
+        if (prices.length === 1) {
+          priceFilter = prices[0]
+        }
+      }
+
+      const { products, currency } = await fetchGifts(tags, priceFilter, delivery, offset, 3)
+      currentCurrency = currency
+
+      if (!products || products.length === 0) {
+        noResults.classList.remove('hidden')
+        if (offset === 0) {
+          grid.classList.add('hidden')
+        }
+        showMoreContainer.classList.add('hidden')
+        return
+      }
+
+      // Show the grid if it was hidden
+      grid.classList.remove('hidden')
+      showMoreContainer.classList.remove('hidden')
+
+      // Create and append new gift cards
+      products.forEach((product: any) => {
+        const card = createGiftCard(product, currency)
+        grid.appendChild(card)
+      })
+
+      // Update offset for next load
+      const newOffset = offset + products.length
+      showMoreBtn.dataset.offset = newOffset.toString()
+
+      // Only show the button if we received the full limit of results
+      if (products.length < 3) {
+        showMoreContainer.classList.add('hidden')
+      } else {
+        showMoreBtn.classList.remove('hidden')
+      }
+
+      noResults.classList.add('hidden')
+    } catch (error) {
+      console.error('Error loading gifts:', error)
+      noResults.classList.remove('hidden')
+    } finally {
+      isLoading = false
+      loading.classList.add('hidden')
+      initialLoading.classList.add('hidden')
+    }
+  }
+
+  // Add event listener for show more button
+  document.addEventListener('DOMContentLoaded', () => {
+    const showMoreBtn = document.getElementById('show-more-btn')
+    if (!showMoreBtn) return
+
+    showMoreBtn.addEventListener('click', () => {
+      const offset = parseInt(showMoreBtn.dataset.offset || '0')
+      loadGifts(offset)
+    })
+
+    // Load initial gifts
+    loadGifts(0)
+  })
+</script>
+
+<style>
+  .spinner {
+    display: inline-block;
+    animation: spin 1s ease-in-out infinite;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--link-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    background-color: var(--link-color);
+    padding: 0.5rem 1rem;
+    color: white;
+    font-weight: 600;
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+</style>
