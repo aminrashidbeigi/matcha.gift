@@ -132,23 +132,20 @@ import Card from '../components/Card.astro'
     card.className =
       'gift-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg'
 
-    // Build tags and seller badge HTML
-    let tagsHtml = ''
-    if (product.tags && product.tags.length > 0) {
-      tagsHtml += `<div class="mt-2 flex items-center justify-between">`
-      tagsHtml += `<div class="flex flex-wrap gap-1">`
-      tagsHtml += product.tags
-        .map((tag: any) => `<span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">${tag.name}</span>`)
-        .join('')
-      tagsHtml += `</div>`
+    // Check if product has instant delivery
+    const isInstantDelivery = product.delivery === 'instant'
+
+    // Build badges HTML
+    let badgesHtml = ''
+    if (isInstantDelivery || product.seller) {
+      badgesHtml += `<div class="mt-2 flex items-center justify-between">`
       if (product.seller) {
-        tagsHtml += `<span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 whitespace-nowrap">${product.seller}</span>`
+        badgesHtml += `<span class="rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">${product.seller}</span>`
       }
-      tagsHtml += `</div>`
-    } else if (product.seller) {
-      tagsHtml += `<div class="mt-2 flex justify-end">`
-      tagsHtml += `<span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 whitespace-nowrap">${product.seller}</span>`
-      tagsHtml += `</div>`
+      if (isInstantDelivery) {
+        badgesHtml += `<span class="rounded-full bg-green-100 px-2 py-1 text-xs text-green-700">Instant Delivery</span>`
+      }
+      badgesHtml += `</div>`
     }
 
     card.innerHTML = `
@@ -157,7 +154,7 @@ import Card from '../components/Card.astro'
         <p class="text-sm text-gray-600">
           ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
         </p>
-        ${tagsHtml}
+        ${badgesHtml}
         <div class="mt-4 flex justify-center">
           <button
             onclick="window.open('${product.link}', '_blank')"
