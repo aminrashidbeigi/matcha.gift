@@ -7,6 +7,7 @@ interface Props {
   showSeller?: boolean
   showTags?: boolean
   showButton?: boolean
+  showImage?: boolean
   buttonText?: string
   buttonLink?: string
   onSelect?: () => void
@@ -19,64 +20,69 @@ const {
   showSeller = false,
   showTags = false,
   showButton = true,
+  showImage = true,
   buttonText = 'View Gift',
   buttonLink,
   isSelected = false,
 } = Astro.props
 
-const price = currency === 'dollar' ? `$${product.priceDlr}` : `€${product.priceEur}`
+const price = currency === 'dollar' ? `$${product.price}` : `€${product.price}`
 ---
 
 <div
   class:list={[
     'gift-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg',
-    { 'ring-2 ring-[var(--link-color)]': isSelected }
+    { 'ring-2 ring-[var(--link-color)]': isSelected },
   ]}
 >
-  <div class="relative aspect-square overflow-hidden">
-    <img
-      src={product.image}
-      alt={product.title}
-      class="h-full w-full object-cover transition-transform group-hover:scale-105"
-    />
-    <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5"></div>
-  </div>
+  {
+    showImage && (
+      <div class="relative aspect-square overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.title}
+          class="h-full w-full object-cover transition-transform group-hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5" />
+      </div>
+    )
+  }
   <div class="p-4">
     <h3 class="mb-1 line-clamp-2 text-lg font-semibold">{product.title}</h3>
-    
-    {showSeller && product.seller && (
-      <p class="mb-2 text-sm text-gray-600">by {product.seller}</p>
-    )}
-    
+
+    {showSeller && product.seller && <p class="mb-2 text-sm text-gray-600">by {product.seller}</p>}
+
     <p class="text-sm text-gray-600">{price}</p>
-    
-    {showTags && product.tags && product.tags.length > 0 && (
-      <div class="mt-2 flex items-center justify-between">
-        <div class="flex flex-wrap gap-1">
-          {product.tags.map((tag) => (
-            <span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-              {tag.name}
+
+    {
+      showTags && product.tags && product.tags.length > 0 && (
+        <div class="mt-2 flex items-center justify-between">
+          <div class="flex flex-wrap gap-1">
+            {product.tags.map((tag) => (
+              <span class="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">{tag.name}</span>
+            ))}
+          </div>
+          {showSeller && product.seller && (
+            <span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold whitespace-nowrap text-purple-700">
+              Seller: {product.seller}
             </span>
-          ))}
+          )}
         </div>
-        {showSeller && product.seller && (
-          <span class="ml-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 whitespace-nowrap">
-            Seller: {product.seller}
-          </span>
-        )}
-      </div>
-    )}
-    
-    {showButton && (
-      <a
-        href={buttonLink || product.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-4 block w-full rounded-lg bg-[var(--link-color)] px-4 py-2 text-center text-white transition-colors hover:bg-[var(--link-color-hover)]"
-      >
-        {buttonText}
-      </a>
-    )}
+      )
+    }
+
+    {
+      showButton && (
+        <a
+          href={buttonLink || product.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-4 block w-full rounded-lg bg-[var(--link-color)] px-4 py-2 text-center text-white transition-colors hover:bg-[var(--link-color-hover)]"
+        >
+          {buttonText}
+        </a>
+      )
+    }
   </div>
 </div>
 
@@ -105,13 +111,13 @@ const price = currency === 'dollar' ? `$${product.priceDlr}` : `€${product.pri
   }
 
   .seller-badge {
+    margin-left: 0.5rem;
+    border-radius: 9999px;
     background-color: #f3e8ff;
+    padding: 0.25rem 0.75rem;
     color: #7c3aed;
     font-weight: 600;
-    border-radius: 9999px;
-    padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
     white-space: nowrap;
-    margin-left: 0.5rem;
   }
-</style> 
+</style>

@@ -2,8 +2,7 @@
 export interface Product {
     id: number
     title: string
-    priceDlr: number
-    priceEur: number
+    price: number
     priceRange: string
     delivery: string
     image: string
@@ -27,9 +26,8 @@ const API_KEY = import.meta.env.PUBLIC_SUPABASE_API_KEY
 
 // Function to format price
 export function formatPrice(product: Product, currency: string): string {
-    const price = currency === 'dollar' ? product.priceDlr : product.priceEur
     const symbol = currency === 'dollar' ? '$' : '€'
-    return `${symbol}${price}`
+    return `${symbol}${product.price}`
 }
 
 // Function to fetch gifts
@@ -38,10 +36,10 @@ export async function fetchGifts(
     priceRange?: string,
     timeConstraint?: string,
     offset: number = 0,
-    limit: number = 12
+    limit: number = 8
 ): Promise<{ products: Product[], currency: string }> {
     try {
-        const requestBody = {
+        const requestBody: Record<string, any> = {
             tags: tags.length > 0 ? tags : undefined,
             priceRange,
             delivery: timeConstraint,

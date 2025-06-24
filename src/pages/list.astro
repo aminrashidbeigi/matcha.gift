@@ -13,7 +13,7 @@ import Card from '../components/Card.astro'
           <div class="flex gap-2">
             <button
               id="urgent-delivery-btn"
-              onclick="window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'delivery=below_day'"
+              onclick="window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'delivery=instant'"
               class="button has-icon inline-flex items-center gap-2 px-4 py-2 text-sm"
             >
               <svg
@@ -31,7 +31,7 @@ import Card from '../components/Card.astro'
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              <span>Urgent Delivery</span>
+              <span>Instant Delivery</span>
             </button>
             <button
               id="cheaper-gifts-btn"
@@ -122,7 +122,7 @@ import Card from '../components/Card.astro'
     cheaperGiftsBtn.style.display = 'none'
   }
 
-  if (urgentDeliveryBtn && delivery === 'below_day') {
+  if (urgentDeliveryBtn && delivery === 'instant') {
     urgentDeliveryBtn.style.display = 'none'
   }
 
@@ -152,18 +152,10 @@ import Card from '../components/Card.astro'
     }
 
     card.innerHTML = `
-      <div class="relative aspect-square overflow-hidden">
-        <img
-          src="${product.image}"
-          alt="${product.title}"
-          class="h-full w-full object-cover transition-transform group-hover:scale-105"
-        />
-        <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5"></div>
-      </div>
       <div class="p-4">
         <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
         <p class="text-sm text-gray-600">
-          ${currency === 'dollar' ? `$${product.priceDlr}` : `€${product.priceEur}`}
+          ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
         </p>
         ${tagsHtml}
         <div class="mt-4 flex justify-center">

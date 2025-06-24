@@ -19,6 +19,23 @@ async function getCountryFromIP(ip) {
         return null;
     }
 }
+// Utility function for country-based sorting
+function sortByCountryAndScore(gifts, userCountry, hasTags = false) {
+    return gifts.sort((a, b) => {
+        // First sort by country (user's country first)
+        const aIsUserCountry = a.country === userCountry;
+        const bIsUserCountry = b.country === userCountry;
+        if (aIsUserCountry && !bIsUserCountry) return -1;
+        if (!aIsUserCountry && bIsUserCountry) return 1;
+
+        // Then sort by tag score or ID
+        if (hasTags) {
+            return b.score - a.score;
+        } else {
+            return a.id - b.id;
+        }
+    });
+}
 Deno.serve(async (req) => {
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
@@ -58,23 +75,25 @@ Deno.serve(async (req) => {
     let base = supabase.from("gifts").select("*, gift_tags(tag_id, tags(id, name))", {
         count: "exact"
     });
-    if (delivery === "below_day") {
-        base = base.in("delivery", [
-            "below_day"
-        ]);
-    } else if (delivery === "below_week") {
-        base = base.in("delivery", [
-            "below_day",
-            "below_week"
-        ]);
-    } else if (delivery === "more_than_week") {
-        // No filter applied: include all delivery types
+    if (delivery === "instant") {
+        base = base.eq("delivery", "instant");
     }
     if (priceRange) {
         base = base.eq("priceRange", priceRange);
     }
-    const preloadSize = Math.max(100, (offset + giftLimit) * 2);
-    base = base.range(0, preloadSize - 1);
+
+    // Apply database-level ordering: country first (user's country prioritized), then by id
+    if (country) {
+        // Order by country first (user's country will be sorted naturally), then by id
+        base = base.order('country', { ascending: true, nullsLast: true })
+            .order('id', { ascending: true });
+    } else {
+        // Fallback to simple id ordering if no country detected
+        base = base.order('id', { ascending: true });
+    }
+
+    // Apply pagination at database level
+    base = base.range(offset, offset + giftLimit - 1);
     const { data, error } = await base;
     if (error) {
         return new Response(JSON.stringify({
@@ -87,6 +106,13 @@ Deno.serve(async (req) => {
             }
         });
     }
+
+    // Debug: Check if delivery filter is working
+    if (delivery === "instant") {
+        const instantItems = (data || []).filter(item => item.delivery === "instant");
+        console.log(`Delivery filter: Found ${instantItems.length} instant items out of ${data?.length || 0} total items`);
+    }
+
     const prepared = (data || []).map(({ gift_tags, ...gift }) => {
         const tagList = (gift_tags || []).map((gt) => gt.tags).filter(Boolean);
         const score = tagList.filter((t) => tagSet.has(t.name)).length;
@@ -96,19 +122,15 @@ Deno.serve(async (req) => {
             score
         };
     });
-    let final;
-    if (tags.length > 0) {
-        final = prepared.sort((a, b) => b.score - a.score);
-    } else {
-        // Stable sort by e.g. created_at or id
-        final = prepared.sort((a, b) => a.id - b.id); // Use any consistently available field
-    }
-    final = final.slice(offset, offset + giftLimit);
-    final = final.map(({ score, priceEur, priceDlr, ...gift }) => {
+
+    // Data is already sorted and paginated at database level
+    let final = prepared.map(({ score, priceEur, priceDlr, affiliate_link, original_link, ...gift }) => {
         const price = currency === "dollar" ? priceDlr : priceEur;
+        const link = affiliate_link || original_link; // Use affiliate link by default, fall back to original
         return {
             ...gift,
-            price
+            price,
+            link
         };
     });
     return new Response(JSON.stringify({
