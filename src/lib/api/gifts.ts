@@ -22,6 +22,7 @@ export interface ApiResponse {
 
 // API configuration
 const API_URL = 'https://haufabfvozxukyawzsnc.supabase.co/functions/v1/fetch-gifts'
+const LIST_API_URL = 'https://haufabfvozxukyawzsnc.supabase.co/functions/v1/list'
 const API_KEY = import.meta.env.PUBLIC_SUPABASE_API_KEY
 
 // Function to format price
@@ -30,7 +31,7 @@ export function formatPrice(product: Product, currency: string): string {
     return `${symbol}${product.price}`
 }
 
-// Function to fetch gifts
+// Function to fetch gifts for the list page (original function)
 export async function fetchGifts(
     tags: string[] = [],
     priceRange?: string,
@@ -72,6 +73,37 @@ export async function fetchGifts(
         }
     } catch (error) {
         console.error('Failed to fetch gifts:', error)
+        return { products: [], currency: 'dollar' }
+    }
+}
+
+// Function to fetch gifts for the GiftMatcher component
+export async function fetchGiftsForMatcher(): Promise<{ products: Product[], currency: string }> {
+    try {
+        const requestBody = {
+            name: 'home'
+        }
+
+        const response = await fetch(LIST_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data: ApiResponse = await response.json()
+        return {
+            products: data.gifts || [],
+            currency: data.currency || 'dollar'
+        }
+    } catch (error) {
+        console.error('Failed to fetch gifts for matcher:', error)
         return { products: [], currency: 'dollar' }
     }
 } 

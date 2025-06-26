@@ -1,5 +1,5 @@
 import type { Product } from './api/gifts'
-import { fetchGifts, formatPrice } from './api/gifts'
+import { fetchGiftsForMatcher, formatPrice } from './api/gifts'
 
 // Global state
 let productsCache: Product[] = []
@@ -12,8 +12,6 @@ function createGiftCard(product: Product): HTMLElement {
     card.className = 'gift-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg cursor-pointer'
     card.dataset.productId = product.id.toString()
 
-    const price = formatPrice(product, currentCurrency)
-
     card.innerHTML = `
     <div class="relative aspect-square overflow-hidden">
       <img src="${product.image}" alt="${product.title}" class="h-full w-full object-cover transition-transform group-hover:scale-105" />
@@ -21,7 +19,6 @@ function createGiftCard(product: Product): HTMLElement {
     </div>
     <div class="p-4">
       <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
-      <p class="text-sm text-gray-600">${price}</p>
     </div>
   `
 
@@ -67,7 +64,7 @@ export async function initialize() {
     if (!grid || !loading || !noResults || !error) return
 
     try {
-        const result = await fetchGifts()
+        const result = await fetchGiftsForMatcher()
         productsCache = result.products
         currentCurrency = result.currency
 
