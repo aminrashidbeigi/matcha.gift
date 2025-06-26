@@ -5,6 +5,8 @@ import Card from '../components/Card.astro'
 ---
 
 <DefaultLayout title="Your Gift List">
+  <script async data-uid="6d033c7061" src="https://amin-rashidbeigi.kit.com/6d033c7061/index.js"></script>
+
   <section class="bg-[var(--background-color)] py-16">
     <div class="container">
       <div class="mx-auto max-w-6xl">
@@ -149,22 +151,15 @@ import Card from '../components/Card.astro'
     }
 
     card.innerHTML = `
-      <div class="p-4">
-        <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
-        <p class="text-sm text-gray-600">
-          ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
-        </p>
-        ${badgesHtml}
-        <div class="mt-4 flex justify-center">
-          <button
-            onclick="window.open('${product.link}', '_blank')"
-            class="button has-icon rounded-lg px-4 py-2 text-center text-white text-base font-semibold transition-colors hover:bg-[var(--link-color-hover)]"
-            type="button"
-          >
-            View Gift
-          </button>
+      <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="block no-underline text-inherit" style="text-decoration: none; color: inherit;">
+        <div class="p-4">
+          <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
+          <p class="text-sm text-gray-600">
+            ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
+          </p>
+          ${badgesHtml}
         </div>
-      </div>
+      </a>
     `
 
     return card
@@ -295,5 +290,26 @@ import Card from '../components/Card.astro'
   .button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .gift-card,
+  .gift-card *,
+  .gift-card a,
+  .gift-card a * {
+    box-shadow: none !important;
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  .gift-card:focus,
+  .gift-card:active,
+  .gift-card *:focus,
+  .gift-card *:active,
+  .gift-card a:focus,
+  .gift-card a:active,
+  .gift-card a *:focus,
+  .gift-card a *:active {
+    box-shadow: none !important;
+    color: inherit !important;
+    text-decoration: none !important;
   }
 </style>

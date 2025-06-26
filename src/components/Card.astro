@@ -5,34 +5,23 @@ interface Props {
   product: Product
   currency: string
   showSeller?: boolean
-  showButton?: boolean
   showImage?: boolean
-  buttonText?: string
-  buttonLink?: string
   onSelect?: () => void
   isSelected?: boolean
 }
 
-const {
-  product,
-  currency,
-  showSeller = false,
-  showButton = true,
-  showImage = true,
-  buttonText = 'View Gift',
-  buttonLink,
-  isSelected = false,
-} = Astro.props
+const { product, currency, showSeller = false, showImage = true, isSelected = false } = Astro.props
 
 const price = currency === 'dollar' ? `$${product.price}` : `€${product.price}`
 const isInstantDelivery = product.delivery === 'instant'
 ---
 
-<div
-  class:list={[
-    'gift-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg',
-    { 'ring-2 ring-[var(--link-color)]': isSelected },
-  ]}
+<a
+  href={product.link}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="gift-card group {isSelected ? 'ring-2 ring-[var(--link-color)]' : ''} relative block overflow-hidden rounded-xl bg-white text-inherit no-underline shadow-md transition-all hover:shadow-lg"
+  style="text-decoration: none; color: inherit;"
 >
   {
     showImage && (
@@ -67,46 +56,48 @@ const isInstantDelivery = product.delivery === 'instant'
         </div>
       )
     }
-
-    {
-      showButton && (
-        <a
-          href={buttonLink || product.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-4 block w-full rounded-lg bg-[var(--link-color)] px-4 py-2 text-center text-white transition-colors hover:bg-[var(--link-color-hover)]"
-        >
-          {buttonText}
-        </a>
-      )
-    }
   </div>
-</div>
+</a>
 
 <style>
+  .gift-card,
+  .gift-card *,
+  .gift-card a,
+  .gift-card a * {
+    box-shadow: none !important;
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+  .gift-card:focus,
+  .gift-card:active,
+  .gift-card *:focus,
+  .gift-card *:active,
+  .gift-card a:focus,
+  .gift-card a:active,
+  .gift-card a *:focus,
+  .gift-card a *:active {
+    box-shadow: none !important;
+    color: inherit !important;
+    text-decoration: none !important;
+  }
   .gift-card {
     transition: all 0.2s ease-in-out;
   }
-
   .gift-card:hover {
     transform: translateY(-4px);
   }
-
   .gift-card img {
     transition: transform 0.3s ease-in-out;
   }
-
   .gift-card:hover img {
     transform: scale(1.05);
   }
-
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-
   .seller-badge {
     margin-left: 0.5rem;
     border-radius: 9999px;
