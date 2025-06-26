@@ -1,11 +1,16 @@
 ---
 import { Icon } from 'astro-icon/components'
+import { fetchGiftsForMatcher } from '../lib/api/gifts'
+import type { Product } from '../lib/api/gifts'
 
 /**
  * GiftMatcher Component
  *
  * @description A component that allows users to select interests and get gift recommendations
  */
+
+// Fetch products server-side
+const { products, currency } = await fetchGiftsForMatcher()
 
 type Interest = {
   id: string
@@ -23,23 +28,34 @@ type Interest = {
 
       <!-- Gift Grid -->
       <div id="gift-grid" class="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <!-- Gift cards will be dynamically inserted here -->
-      </div>
-
-      <!-- Loading State -->
-      <div id="loading-spinner" class="mt-6 flex justify-center">
-        <span class="spinner"></span>
+        {
+          products.map((product) => (
+            <div
+              class="gift-card group relative cursor-pointer overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg"
+              data-product-id={product.id}
+            >
+              <div class="relative aspect-square overflow-hidden">
+                <img
+                  src={product.image}
+                  alt={product.title}
+                  class="h-full w-full object-cover transition-transform group-hover:scale-105"
+                />
+                <div class="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/5" />
+              </div>
+              <div class="p-4">
+                <h3 class="mb-1 line-clamp-2 text-lg font-semibold">{product.title}</h3>
+              </div>
+            </div>
+          ))
+        }
       </div>
 
       <!-- No Results Message -->
-      <div id="no-results-message" class="mt-6 hidden text-center text-red-500">
-        No matching products found. Try selecting different gifts!
-      </div>
-
-      <!-- Error Message -->
-      <div id="error-message" class="mt-6 hidden text-center text-red-500">
-        Unable to load gift data. Please try again later.
-      </div>
+      {
+        products.length === 0 && (
+          <div class="mt-6 text-center text-red-500">No matching products found. Try selecting different gifts!</div>
+        )
+      }
     </div>
   </div>
 </section>
@@ -63,12 +79,65 @@ type Interest = {
   </div>
 </div>
 
-<script>
-  import { initialize } from '../lib/gift-matcher'
+<script define:vars={{ products }}>
+  // Client-side functionality for gift selection
+  let selectedGifts = new Set()
+  let productsData = products
+
+  // Function to toggle gift selection
+  function toggleGiftSelection(productId) {
+    const card = document.querySelector(`[data-product-id="${productId}"]`)
+
+    if (selectedGifts.has(productId)) {
+      selectedGifts.delete(productId)
+      card?.classList.remove('ring-2', 'ring-[var(--link-color)]')
+    } else {
+      selectedGifts.add(productId)
+      card?.classList.add('ring-2', 'ring-[var(--link-color)]')
+    }
+
+    updateSelectionProgress()
+  }
+
+  // Function to update selection progress
+  function updateSelectionProgress() {
+    const countElement = document.getElementById('selection-count')
+    if (!countElement) return
+
+    const count = selectedGifts.size
+    countElement.textContent = count.toString()
+  }
 
   // Initialize when the page loads
   document.addEventListener('astro:page-load', () => {
-    initialize()
+    // Add click handlers to all gift cards
+    const giftCards = document.querySelectorAll('.gift-card')
+    giftCards.forEach((card) => {
+      const productId = parseInt(card.getAttribute('data-product-id') || '0')
+      card.addEventListener('click', () => {
+        toggleGiftSelection(productId)
+      })
+    })
+
+    // Add event listener for get inspired button
+    const getInspiredBtn = document.getElementById('get-inspired-btn')
+    getInspiredBtn?.addEventListener('click', () => {
+      // Get selected products
+      const selectedProducts = productsData.filter((p) => selectedGifts.has(p.id))
+
+      // Get all unique tags from selected gifts
+      const selectedTags = new Set()
+      selectedProducts.forEach((product) => {
+        product.tags.forEach((tag) => selectedTags.add(tag.name.toLowerCase()))
+      })
+
+      // Build URL parameters with tags
+      const params = new URLSearchParams()
+      params.set('tags', Array.from(selectedTags).join(','))
+
+      // Redirect to list page with parameters
+      window.location.href = `/list?${params.toString()}`
+    })
   })
 </script>
 
@@ -94,23 +163,6 @@ type Interest = {
   @media (max-width: 640px) {
     .gift-card {
       max-width: 100%;
-    }
-  }
-
-  /* Loading spinner */
-  .spinner {
-    display: inline-block;
-    animation: spin 1s ease-in-out infinite;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-top-color: var(--link-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
     }
   }
 
