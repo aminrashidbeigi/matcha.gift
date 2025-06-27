@@ -190,19 +190,120 @@ import Card from '../components/Card.astro'
     }
 
     card.innerHTML = `
-      <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="block no-underline text-inherit" style="text-decoration: none; color: inherit;">
-        <div class="p-4">
-          <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
-          <p class="text-sm text-gray-600">
-            ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
-          </p>
-          ${badgesHtml}
-        </div>
-      </a>
+      <div class="relative">
+        <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="block no-underline text-inherit" style="text-decoration: none; color: inherit;">
+          <div class="p-4">
+            <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
+            <p class="text-sm text-gray-600">
+              ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
+            </p>
+            ${badgesHtml}
+          </div>
+        </a>
+        <button 
+          class="share-btn absolute top-2 right-2 rounded-full bg-white/80 p-2 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:shadow-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+          onclick="copyToClipboard('${product.link}', this)"
+          title="Copy link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-4 w-4 text-gray-600"
+          >
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+        </button>
+      </div>
     `
 
     return card
   }
+
+  // Function to copy link to clipboard
+  function copyToClipboard(text: string, button: HTMLElement) {
+    // Prevent the click from bubbling up to the card link
+    event?.stopPropagation()
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        // Show success feedback
+        const originalHTML = button.innerHTML
+        button.innerHTML = `
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-4 w-4 text-green-600"
+        >
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      `
+        button.classList.add('bg-green-100')
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          button.innerHTML = originalHTML
+          button.classList.remove('bg-green-100')
+        }, 2000)
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err)
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        document.body.appendChild(textArea)
+        textArea.select()
+        try {
+          document.execCommand('copy')
+          // Show success feedback
+          const originalHTML = button.innerHTML
+          button.innerHTML = `
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-4 w-4 text-green-600"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        `
+          button.classList.add('bg-green-100')
+
+          // Reset after 2 seconds
+          setTimeout(() => {
+            button.innerHTML = originalHTML
+            button.classList.remove('bg-green-100')
+          }, 2000)
+        } catch (err) {
+          console.error('Fallback copy failed: ', err)
+        }
+        document.body.removeChild(textArea)
+      })
+  }
+
+  // Make copyToClipboard globally accessible
+  ;(window as any).copyToClipboard = copyToClipboard
 
   async function loadGifts(offset: number = 0) {
     const loading = document.getElementById('loading-spinner')
