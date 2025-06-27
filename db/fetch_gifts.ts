@@ -96,36 +96,60 @@ Deno.serve(async (req: Request) => {
         });
     }
 
-    // Build the base query
-    let base = supabase.from("gifts").select("*, gift_tags(tag_id, tags(id, name))", {
-        count: "exact"
-    });
+    // Build the base query with proper database-level sorting
+    let query;
 
+    if (tags.length > 0) {
+        // When tags are provided, we'll fetch all gifts and their tags, then sort by tag matches
+        query = supabase
+            .from('gifts')
+            .select('*, gift_tags(tag_id, tags(id, name))', {
+                count: "exact"
+            });
+    } else {
+        // No tags provided, use simple query
+        query = supabase.from("gifts").select("*, gift_tags(tag_id, tags(id, name))", {
+            count: "exact"
+        });
+    }
+
+    // Apply filters
     if (delivery === "instant") {
-        base = base.eq("delivery", "instant");
+        query = query.eq("delivery", "instant");
     }
     if (priceRange) {
-        base = base.eq("priceRange", priceRange);
+        query = query.eq("priceRange", priceRange);
     }
 
-    // Apply database-level ordering based on tags and country
+    // Only fetch enabled products
+    query = query.eq("enabled", true);
+
+    // Apply database-level ordering
     if (tags.length > 0) {
-        // When tags are provided, we need to sort by matched tag count first
-        // We'll use a subquery approach to count matched tags
-        base = base.order('id', { ascending: true }); // Fallback ordering
+        // For tag-based queries, we'll fetch more data and sort in memory to ensure proper ordering
+        // Remove pagination temporarily to get all matching items for proper sorting
+        query = query.order('id', { ascending: true });
     } else {
         // No tags provided, sort by country and id
         if (country) {
-            base = base.order('country', { ascending: true, nullsLast: true })
+            query = query.order('country', { ascending: true, nullsLast: true })
                 .order('id', { ascending: true });
         } else {
-            base = base.order('id', { ascending: true });
+            query = query.order('id', { ascending: true });
         }
     }
 
-    // Apply pagination at database level
-    base = base.range(offset, offset + giftLimit - 1);
-    const { data, error } = await base;
+    // For tag-based queries, we need to fetch more data to sort properly
+    if (tags.length > 0) {
+        // Fetch more items to ensure we have enough for proper sorting
+        const fetchLimit = Math.max(giftLimit * 3, 50); // Fetch more to ensure good sorting
+        query = query.range(0, fetchLimit - 1);
+    } else {
+        // Apply pagination at database level for non-tag queries
+        query = query.range(offset, offset + giftLimit - 1);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         return new Response(JSON.stringify({
@@ -145,6 +169,21 @@ Deno.serve(async (req: Request) => {
         console.log(`Delivery filter: Found ${instantItems.length} instant items out of ${data?.length || 0} total items`);
     }
 
+    // Debug: Check tag sorting results
+    if (tags.length > 0) {
+        console.log(`Tag sorting: Requested tags: ${tags.join(', ')}`);
+        const tagCounts = (data || []).map((item: any) => {
+            const tagList = (item.gift_tags || []).map((gt: any) => gt.tags?.name).filter(Boolean);
+            const score = tagList.filter((t: string) => tagSet.has(t)).length;
+            return {
+                id: item.id,
+                matched_count: score,
+                tags: tagList
+            };
+        });
+        console.log('Tag match counts:', tagCounts);
+    }
+
     // Process the data and calculate tag scores
     const prepared = (data || []).map(({ gift_tags, ...gift }: Gift & { gift_tags: GiftTag[] }): GiftWithScore => {
         const tagList = (gift_tags || []).map((gt: GiftTag) => gt.tags).filter(Boolean);
@@ -156,7 +195,7 @@ Deno.serve(async (req: Request) => {
         };
     });
 
-    // Sort by tag score if tags were provided
+    // Sort by tag score if tags were provided, then apply pagination
     let final = prepared;
     if (tags.length > 0) {
         final = prepared.sort((a: GiftWithScore, b: GiftWithScore) => {
@@ -176,10 +215,13 @@ Deno.serve(async (req: Request) => {
             // Finally sort by ID
             return a.id - b.id;
         });
+
+        // Apply pagination after sorting for tag-based queries
+        final = final.slice(offset, offset + giftLimit);
     }
 
     // Transform the final result
-    final = final.map(({ score, priceEur, priceDlr, affiliate_link, original_link, ...gift }: GiftWithScore) => {
+    const transformed = final.map(({ score, priceEur, priceDlr, affiliate_link, original_link, ...gift }: GiftWithScore) => {
         const price = currency === "dollar" ? priceDlr : priceEur;
         const link = affiliate_link || original_link; // Use affiliate link by default, fall back to original
         return {
@@ -191,7 +233,7 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify({
         currency,
-        gifts: final
+        gifts: transformed
     }), {
         headers: {
             ...corsHeaders,
