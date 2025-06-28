@@ -85,6 +85,7 @@ Deno.serve(async (req: Request) => {
         .from("list_gifts")
         .select(`
             gift_id,
+            order,
             gifts (
                 *,
                 gift_tags (
@@ -97,7 +98,7 @@ Deno.serve(async (req: Request) => {
             )
         `)
         .eq("list_id", listData.id)
-        .order('created_at', { ascending: true });
+        .order('order', { ascending: true });
 
     if (giftsError) {
         return new Response(JSON.stringify({

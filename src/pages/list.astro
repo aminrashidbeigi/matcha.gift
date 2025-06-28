@@ -218,15 +218,44 @@ import { Badge } from 'accessible-astro-components'
       badgesHtml += `</div>`
     }
 
+    // Create price range display
+    let priceRangeHtml = ''
+    if (product.priceRange) {
+      const [minPrice, maxPrice] = product.priceRange.split('-')
+      if (minPrice && maxPrice && minPrice !== maxPrice) {
+        // Both values exist and are different - show range
+        priceRangeHtml = `<p class="text-sm text-gray-600">
+          ${currency === 'dollar' ? `$${minPrice} - $${maxPrice}` : `€${minPrice} - €${maxPrice}`}
+        </p>`
+      } else if (minPrice) {
+        // Only one value exists - show descriptive price category
+        let priceText = ''
+        if (minPrice === 'low') {
+          priceText = currency === 'dollar' ? '$0 to $30' : '€0 to €30'
+        } else if (minPrice === 'mid') {
+          priceText = currency === 'dollar' ? '$30 to $80' : '€30 to €80'
+        } else if (minPrice === 'high') {
+          priceText = currency === 'dollar' ? '> $80' : '> €80'
+        } else {
+          priceText = currency === 'dollar' ? `$${minPrice}` : `€${minPrice}`
+        }
+
+        priceRangeHtml = `<p class="text-sm text-gray-600">
+          ${priceText}
+        </p>`
+      }
+    }
+
     card.innerHTML = `
       <div class="relative flex flex-col h-full">
         <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="block no-underline text-inherit flex-1" style="text-decoration: none; color: inherit;">
           <div class="p-4 pr-10 flex flex-col h-full">
             <div class="flex-1">
               <h3 class="mb-1 line-clamp-2 text-lg font-semibold">${product.title}</h3>
-              <p class="text-sm text-gray-600">
+              <!-- <p class="text-sm text-gray-600">
                 ${currency === 'dollar' ? `$${product.price}` : `€${product.price}`}
-              </p>
+              </p> -->
+              ${priceRangeHtml}
             </div>
             ${badgesHtml}
             <Badge
