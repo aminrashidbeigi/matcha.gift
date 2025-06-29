@@ -111,7 +111,6 @@ import { Badge } from 'accessible-astro-components'
   <button
     id="go-to-top-btn"
     class="fixed right-4 bottom-4 z-[9999] hidden rounded-full bg-[var(--link-color)] p-3 text-white shadow-lg transition-all duration-300 hover:bg-[var(--link-color)]/90 hover:shadow-xl md:right-6 md:bottom-6"
-    onclick="scrollToTop()"
     title="Go to top"
   >
     <svg
@@ -376,9 +375,34 @@ import { Badge } from 'accessible-astro-components'
 
   // Function to scroll to top smoothly
   function scrollToTop() {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
+    try {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    } catch (error) {
+      // Fallback for older browsers
+      window.scrollTo(0, 0)
+    }
+  }
+
+  // Function to test if button is covered by other elements
+  function testButtonCoverage() {
+    const goToTopBtn = document.getElementById('go-to-top-btn')
+    if (!goToTopBtn) return
+
+    const rect = goToTopBtn.getBoundingClientRect()
+    const elementAtPosition = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+
+    // Check multiple points on the button
+    const points = [
+      { x: rect.left + 10, y: rect.top + 10 },
+      { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+      { x: rect.right - 10, y: rect.bottom - 10 },
+    ]
+
+    points.forEach((point, index) => {
+      const element = document.elementFromPoint(point.x, point.y)
     })
   }
 
@@ -387,10 +411,22 @@ import { Badge } from 'accessible-astro-components'
     const goToTopBtn = document.getElementById('go-to-top-btn')
     if (!goToTopBtn) return
 
-    // Show button when scrolled down more than 200px (reduced from 300px for better UX)
-    if (window.scrollY > 200) {
+    // Show button whenever user has scrolled at all (not at the very top)
+    const hasScrolled = window.scrollY > 0
+    const scrollY = window.scrollY
+    const windowHeight = window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
+    const isAtBottom = scrollY + windowHeight >= documentHeight - 10
+
+    // Show button if scrolled OR if at bottom of page
+    if (hasScrolled || isAtBottom) {
       goToTopBtn.classList.remove('hidden')
       goToTopBtn.style.display = 'block'
+
+      // Test if button is covered when at bottom
+      if (isAtBottom) {
+        setTimeout(testButtonCoverage, 100)
+      }
     } else {
       goToTopBtn.classList.add('hidden')
       goToTopBtn.style.display = 'none'
@@ -399,6 +435,28 @@ import { Badge } from 'accessible-astro-components'
 
   // Make scrollToTop globally accessible
   ;(window as any).scrollToTop = scrollToTop
+
+  // Function to force button to be on top
+  function forceButtonOnTop() {
+    const goToTopBtn = document.getElementById('go-to-top-btn')
+    if (!goToTopBtn) return
+
+    // Force the button to be on top
+    goToTopBtn.style.zIndex = '2147483647'
+    goToTopBtn.style.position = 'fixed'
+    goToTopBtn.style.pointerEvents = 'auto'
+
+    // Remove any potential covering elements
+    const rect = goToTopBtn.getBoundingClientRect()
+    const coveringElement = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+
+    if (coveringElement && coveringElement !== goToTopBtn) {
+      if (coveringElement instanceof HTMLElement) {
+        coveringElement.style.zIndex = '1'
+        coveringElement.style.pointerEvents = 'none'
+      }
+    }
+  }
 
   async function loadGifts(offset: number = 0) {
     const loading = document.getElementById('loading-spinner')
@@ -514,6 +572,19 @@ import { Badge } from 'accessible-astro-components'
     // Set up scroll event listener for go to top button
     window.addEventListener('scroll', handleScroll)
 
+    // Set up go to top button click event listener
+    const goToTopBtn = document.getElementById('go-to-top-btn')
+    if (goToTopBtn) {
+      goToTopBtn.addEventListener('click', (e) => {
+        e.preventDefault()
+        scrollToTop()
+      })
+    }
+
+    // Make test function globally accessible
+    ;(window as any).testButtonCoverage = testButtonCoverage
+    ;(window as any).forceButtonOnTop = forceButtonOnTop
+
     // Load initial gifts
     loadGifts(0)
   })
@@ -599,36 +670,63 @@ import { Badge } from 'accessible-astro-components'
 
   /* Go to Top Button Styles */
   #go-to-top-btn {
-    display: none;
+    display: none !important;
     position: fixed !important;
-    transform: translateY(20px);
-    opacity: 0;
-    z-index: 9999 !important;
-    transition: all 0.3s ease-in-out;
+    right: 1rem !important;
+    bottom: 1rem !important;
+    transform: translateZ(0) !important;
+    z-index: 2147483647 !important;
+    transition: all 0.3s ease-in-out !important;
+    cursor: pointer !important;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background-color: var(--link-color) !important;
+    padding: 0.75rem !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    pointer-events: auto !important;
+    color: white !important;
   }
 
   #go-to-top-btn:not(.hidden) {
     display: block !important;
-    transform: translateY(0);
-    opacity: 1;
   }
 
   #go-to-top-btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) !important;
+    opacity: 0.9 !important;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    background-color: var(--link-color) !important;
   }
 
   /* Ensure button is visible on all screen sizes */
-  @media (max-width: 768px) {
+  @media (min-width: 768px) {
     #go-to-top-btn {
-      right: 1rem !important;
-      bottom: 1rem !important;
+      right: 1.5rem !important;
     }
   }
 
-  @media (min-width: 769px) {
-    #go-to-top-btn {
-      right: 1.5rem !important;
-      bottom: 1.5rem !important;
-    }
+  /* Ensure footer doesn't interfere with button */
+  .footer {
+    z-index: 1 !important;
+  }
+
+  /* Ensure footer content doesn't cover the button */
+  .footer .made-with-love {
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+
+  .footer .container {
+    z-index: 1 !important;
+  }
+
+  .footer .footer-content {
+    z-index: 1 !important;
   }
 </style>

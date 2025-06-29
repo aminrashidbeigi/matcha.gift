@@ -26,7 +26,9 @@ const currentYear = new Date().getFullYear()
 <style lang="scss">
   .footer {
     opacity: 0.8;
+    z-index: 1 !important;
     padding: 2rem 0;
+    pointer-events: none !important;
     color: var(--foreground-color);
     text-align: center;
 
@@ -35,6 +37,8 @@ const currentYear = new Date().getFullYear()
       justify-content: center;
       align-items: center;
       gap: 0.5rem;
+      z-index: 1 !important;
+      pointer-events: none !important;
       font-size: 1.1rem;
 
       .heart-icon {
