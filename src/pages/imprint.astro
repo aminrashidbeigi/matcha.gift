@@ -1,0 +1,67 @@
+---
+import DefaultLayout from '../layouts/DefaultLayout.astro'
+import PageHeader from '../components/PageHeader.astro'
+---
+
+<DefaultLayout title="Impressum">
+  <PageHeader title="Impressum" />
+  <main class="container">
+    <div class="mx-auto max-w-3xl">
+      <div class="prose prose-lg dark:prose-invert">
+        <div class="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20">
+          <div class="flex items-start">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-black dark:text-white">Under Maintenance</h3>
+              <div class="mt-2 text-sm text-black dark:text-white">
+                <p>
+                  This impressum page is currently under maintenance and will be filled with complete legal information
+                  soon. We appreciate your patience as we work to provide all necessary legal details.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2>About This Project</h2>
+        <p>
+          MatchaGift is a thoughtful gifting assistant designed to help you find the perfect gifts for your loved ones.
+          Our platform collects and shares meaningful gift ideas to make your gifting experience more personal and
+          stress-free.
+        </p>
+
+        <h2>Affiliate Disclosure</h2>
+        <p>
+          Some of the links on this website are affiliate links. This means that if you click on the link and make a
+          purchase, we may receive a small commission at no additional cost to you. This helps support the maintenance
+          and development of MatchaGift. We only recommend products that we genuinely believe will be valuable to our
+          users.
+        </p>
+
+        <h2>Contact Information</h2>
+        <p>
+          For questions, suggestions, or support, please contact us through our{' '}
+          <a href="https://forms.gle/sfuj4VGcpRWGLhV59" class="text-blue-600 hover:underline dark:text-blue-400">
+            contact form
+          </a>.
+        </p>
+
+        <div class="mt-16 border-t border-[var(--border-color-subtle)] pt-8">
+          <h2>Legal Notice</h2>
+          <p>
+            This impressum page is currently being updated with complete legal information including privacy policy,
+            terms of service, and other required legal details. Please check back soon for the complete legal
+            information.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</DefaultLayout>

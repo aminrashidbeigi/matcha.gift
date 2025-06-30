@@ -19,6 +19,9 @@ const currentYear = new Date().getFullYear()
         Made with <Icon name="lucide:heart" class="heart-icon" />
         {currentYear}
       </p>
+      <div class="footer-links">
+        <a href="/imprint" class="footer-link">Impressum</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -31,6 +34,13 @@ const currentYear = new Date().getFullYear()
     pointer-events: none !important;
     color: var(--foreground-color);
     text-align: center;
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
 
     .made-with-love {
       display: flex;
@@ -46,6 +56,24 @@ const currentYear = new Date().getFullYear()
         width: 1.2rem;
         height: 1.2rem;
         color: #e25555;
+      }
+    }
+
+    .footer-links {
+      z-index: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    .footer-link {
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+      color: var(--foreground-color);
+      font-size: 0.9rem;
+      text-decoration: none;
+
+      &:hover {
+        opacity: 1;
+        text-decoration: underline;
       }
     }
   }
